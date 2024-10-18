@@ -1,6 +1,7 @@
 package com.badlogic.drop;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 
 public class MyGame extends Game {
@@ -12,6 +13,7 @@ public class MyGame extends Game {
     public void create() {
         assetManager = new AssetManager();
 
+        // Create instances of your screens
         loadingScreen = new LoadingScreen(this, assetManager);
         firstScreen = new FirstScreen(this);
 
@@ -19,13 +21,18 @@ public class MyGame extends Game {
     }
 
     public void switchToFirstScreen() {
-        // Switch to FirstScreen when ready
         setScreen(firstScreen);
     }
 
     @Override
+    public void render() {
+        super.render();
+    }
+
+    @Override
     public void dispose() {
-        super.dispose();
+        if (loadingScreen != null) loadingScreen.dispose();
+        if (firstScreen != null) firstScreen.dispose();
         assetManager.dispose();
     }
 }

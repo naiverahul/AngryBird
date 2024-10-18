@@ -121,6 +121,7 @@ public class LoadingScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         stage.getViewport().update(width, height, true);
+        // stage.getViewport().  //// addition here
     }
 
     @Override

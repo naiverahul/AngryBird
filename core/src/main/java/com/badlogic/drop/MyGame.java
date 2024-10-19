@@ -5,9 +5,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 
 public class MyGame extends Game {
-    private FirstScreen firstScreen;
-    private LoadingScreen loadingScreen;
-    private level_screen level_screen;
+    protected FirstScreen firstScreen;
+    protected LoadingScreen loadingScreen;
+    protected level_screen level_screen;
     private AssetManager assetManager;
 
     @Override

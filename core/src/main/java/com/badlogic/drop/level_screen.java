@@ -41,7 +41,7 @@ public class level_screen implements Screen {
         backgroundTexture = new Texture(Gdx.files.internal("First_Screen_bkg.png"));
 
         // Create UI
-        l_game_screen = new game_screen(game, assetManager);
+        l_game_screen = new game_screen(game);
         createUI();
     }
 

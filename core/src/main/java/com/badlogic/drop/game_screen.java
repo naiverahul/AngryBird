@@ -1,138 +1,149 @@
 package com.badlogic.drop;
 
+import Birds.Birdparentclass;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.util.LinkedList;
+import java.util.Queue;
 
-public class game_screen implements Screen{
+public class game_screen implements Screen {
     private MyGame orginal_game_variable;
     private Stage g_stage;
-    private AssetManager g_asset_manager;
-    // private SpriteBatch g_batch; // idk if this is still needed.
-
     private FitViewport g_viewport;
     private Texture g_background;
-    private ImageButton g_back_button, g_pause_button, g_catapult, g_bird_big, g_bird_black, g_bird_red, g_bird_yellow;
+    private ImageButton g_back_button, g_pause_button, g_catapult;
+    private Image current_bird_on_catapult;
 
-    private Screen g_pause_screen, g_level_screen;
-    
-    public game_screen(MyGame game, AssetManager asset_manager){
+    // Queue to manage the birds
+    private Queue<Birdparentclass> birdQueue;
+    private Birdparentclass currentBird;  // Track the bird on the catapult
+
+    public game_screen(MyGame game) {
         this.orginal_game_variable = game;
-        this.g_asset_manager = asset_manager;
-        g_assest_load();
-        
-        g_viewport = new FitViewport(800, 600);
+        g_viewport = new FitViewport(1920, 1080);
         g_stage = new Stage(g_viewport);
 
-        g_pause_screen = orginal_game_variable.pause_screen;
-        g_level_screen = orginal_game_variable.level_screen;
+        g_background = new Texture(Gdx.files.internal("game_screen.png"));
+        birdQueue = new LinkedList<>();
 
-        // g_background = new Texture(Gdx.files.internal("game_screen.png"));
-        g_background = g_asset_manager.get("game_screen.png", Texture.class);
-        // g_catapult = g_asset_manager.get("Catapult.png", Texture.class);
+        loadBirds();  // Load birds into the queue
         g_create_ui();
     }
-    private void g_assest_load(){
-        g_asset_manager.load("game_screen.png", Texture.class);
-        g_asset_manager.load("back.png", Texture.class);
-        g_asset_manager.load("pause.png", Texture.class);
-        g_asset_manager.load("Birdimages/bigbird.png", Texture.class);
-        g_asset_manager.load("Birdimages/blackbird.png", Texture.class);
-        g_asset_manager.load("Birdimages/redbird.png", Texture.class);
-        g_asset_manager.load("Birdimages/yellowbird.png", Texture.class);
-        g_asset_manager.load("Catapult.png", Texture.class);    
-        g_asset_manager.finishLoading();
+
+    // Load birds into the queue
+    private void loadBirds() {
+        birdQueue.add(new Birdparentclass("Big Bird", "Birdimages/bigbird.png", 1, 100));
+        birdQueue.add(new Birdparentclass("Black Bird", "Birdimages/blackbird.png", 1, 120));
+        birdQueue.add(new Birdparentclass("Red Bird", "Birdimages/redbird.png", 1, 80));
+        birdQueue.add(new Birdparentclass("Yellow Bird", "Birdimages/yellowbird.png", 1, 90));
     }
-    private void g_create_ui(){
-        // g_batch = new SpriteBatch(); // idk if this is still needed.
+
+    private void g_create_ui() {
         Table g_table = g_initialize_table(true);
+
+        // Create the catapult button and set its listener
         g_catapult = g_create_button("Catapult.png");
-        g_initialize_buttons();
-        g_set_button_sizes(100f,100f);
+        g_catapult.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                switchToNextBird();  // Switch to the next bird on click
+            }
+        });
+
+        g_back_button = g_create_button("back.png");
+        g_pause_button = g_create_button("pause.png");
+
         g_set_button_listeners();
         g_set_button_positions(g_table);
+        place_bird_on_catapult();  // Place the first bird on the catapult
     }
-    private Table g_initialize_table(boolean fill_parent){
+
+    private Table g_initialize_table(boolean fill_parent) {
         Table table = new Table();
         table.setFillParent(fill_parent);
         g_stage.addActor(table);
+        table.top();
         return table;
     }
-    private void g_initialize_buttons(){
-        g_back_button = g_create_button("back.png");
-        g_pause_button = g_create_button("pause.png");
-        g_bird_big = g_create_button("Birdimages/bigbird.png");
-        g_bird_black = g_create_button("Birdimages/blackbird.png");
-        g_bird_red = g_create_button("Birdimages/redbird.png");
-        g_bird_yellow = g_create_button("Birdimages/yellowbird.png");
-    }
-    private ImageButton g_create_button(String button_path){
-        Texture button_texture = g_asset_manager.get(button_path, Texture.class);
+
+    private ImageButton g_create_button(String button_path) {
+        Texture button_texture = new Texture(Gdx.files.internal(button_path));
+
         TextureRegion button_texture_region = new TextureRegion(button_texture);
-        TextureRegionDrawable button_texture_region_drawable = new TextureRegionDrawable(button_texture_region);
-        ImageButton button = new ImageButton(button_texture_region_drawable);
-        g_stage.addActor(button);
+        ImageButton button = new ImageButton(new Image(button_texture_region).getDrawable());
+
         return button;
     }
-    private void g_set_button_sizes(float button_width, float button_height){
-        g_back_button.setSize(button_width, button_height);
-        g_pause_button.setSize(button_width, button_height);
-        g_bird_big.setSize(button_width, button_height);
-        g_bird_black.setSize(button_width, button_height);
-        g_bird_red.setSize(button_width, button_height);
-        g_bird_yellow.setSize(button_width, button_height);
-    }
-    private void g_set_button_listeners(){
-        g_setup_utility_listener(g_back_button, g_level_screen);
-        g_setup_utility_listener(g_pause_button, g_pause_screen);
-        g_setup_bird_listener(g_bird_big, "big bird");
-        g_setup_bird_listener(g_bird_black, "black bird");  
-        g_setup_bird_listener(g_bird_red, "red bird");
-        g_setup_bird_listener(g_bird_yellow, "yellow bird");
 
-    }
-    private void g_setup_utility_listener(ImageButton button, Screen target_screen){
-        button.addListener(new ClickListener(){
+
+    private void g_set_button_listeners() {
+        g_back_button.addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y){
-                orginal_game_variable.switch_screen(target_screen);
+            public void clicked(InputEvent event, float x, float y) {
+                orginal_game_variable.switch_screen(orginal_game_variable.level_screen);
+            }
+        });
+
+        g_pause_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                orginal_game_variable.switch_screen(orginal_game_variable.pause_screen);
             }
         });
     }
-    private void g_setup_bird_listener(ImageButton bird, String bird_name){
-        bird.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                Gdx.app.log("Bird", bird_name);
-                // change the action.
-            }
-        });
+
+    private void g_set_button_positions(Table g_table) {
+        g_table.add(g_back_button).size(200f,200f).expandX().top().left();
+        g_table.add(g_pause_button).size(200f,200f).expandX().top().right();
+        g_table.row();
+        g_table.row();
+        g_table.row();
+        g_table.add(g_catapult).size(400f,400f).expandX().bottom().left();
     }
-    private void g_set_button_positions(Table g_table){
-        g_table.add(g_back_button).expandX().top().left();
-        g_table.add(g_pause_button).expandX().top().right();
-        g_table.row();
-        g_table.add(g_catapult).expandX().bottom().left().pad(10);
-        g_table.row();
-        g_table.add(g_bird_big).expandX().bottom().left();
-        g_table.add(g_bird_black).expandX().bottom().left().pad(10);
-        g_table.add(g_bird_red).expandX().bottom().left().pad(20);
-        g_table.add(g_bird_yellow).expandX().bottom().left().pad(30);
+
+    // Place the first bird from the queue on the catapult
+    private void place_bird_on_catapult() {
+        if (current_bird_on_catapult != null) {
+            g_stage.getActors().removeValue(current_bird_on_catapult, true);
+        }
+
+        currentBird = birdQueue.poll();  // Get the next bird from the queue
+        if (currentBird == null) {
+            Gdx.app.log("BirdQueue", "No more birds in the queue");
+            return;
+        }
+
+        current_bird_on_catapult = new Image(new TextureRegion(currentBird.getTexture()));
+
+        float catapultX = g_catapult.getX();
+        float catapultY = g_catapult.getY() + g_catapult.getHeight();
+        current_bird_on_catapult.setPosition(catapultX, catapultY);
+
+        g_stage.addActor(current_bird_on_catapult);
+        Gdx.app.log("Bird Placement", "Placed " + currentBird.getName() + " on the catapult");
+    }
+
+    // Switch to the next bird when the catapult is clicked
+    private void switchToNextBird() {
+        // Place the current bird back into the queue
+        if (currentBird != null) {
+            birdQueue.add(currentBird);
+        }
+
+        // Place the next bird on the catapult
+        place_bird_on_catapult();
     }
 
     @Override
@@ -145,12 +156,9 @@ public class game_screen implements Screen{
         ScreenUtils.clear(Color.CYAN);
 
         g_stage.getBatch().begin();
-
-        g_stage.getBatch().draw(g_background, 0, 0, 800, 600);
-
+        g_stage.getBatch().draw(g_background, 0, 0, g_viewport.getWorldWidth(), g_viewport.getWorldHeight());
         g_stage.getBatch().end();
-        
-        // g_stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+
         g_stage.act(delta);
         g_stage.draw();
     }
@@ -158,6 +166,20 @@ public class game_screen implements Screen{
     @Override
     public void resize(int width, int height) {
         g_viewport.update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        g_stage.dispose();
+        g_background.dispose();
+        disposeBirds();  // Dispose bird textures
+    }
+
+    // Dispose all bird textures in the queue
+    private void disposeBirds() {
+        for (Birdparentclass bird : birdQueue) {
+            bird.dispose();
+        }
     }
 
     @Override
@@ -170,22 +192,4 @@ public class game_screen implements Screen{
 
     @Override
     public void resume() {}
-
-    @Override
-    public void dispose() {
-        g_stage.dispose();
-        // g_batch.dispose(); // idk if this is still needed.
-        g_background.dispose();
-        g_unload_asset_manager();
-    }
-    private void g_unload_asset_manager(){
-        g_asset_manager.unload("game_screen.png");
-        g_asset_manager.unload("back.png");
-        g_asset_manager.unload("pause.png");
-        g_asset_manager.unload("Birdimages/bigbird.png");
-        g_asset_manager.unload("Birdimages/blackbird.png");
-        g_asset_manager.unload("Birdimages/redbird.png");
-        g_asset_manager.unload("Birdimages/yellowbird.png");
-        g_asset_manager.unload("Catapult.png");
-    }
 }

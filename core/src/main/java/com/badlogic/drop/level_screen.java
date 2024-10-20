@@ -5,7 +5,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,182 +16,130 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class level_screen implements Screen {
-    private MyGame original_game_variable;
-    private Stage l_stage;
-    private AssetManager l_asset_manager;
-    private SpriteBatch l_batch;
-    private FitViewport l_viewport;
-    private Texture l_background, l_back, l_1, l_2, l_3, l_4;
-    private ImageButton l_back_button, l_1_button, l_2_button, l_3_button, l_4_button;
-    private Table table;
+    private MyGame game;
+    private Stage stage;
+    private AssetManager assetManager;
+    private Texture backgroundTexture;
 
-    // private void asset_load_check(Object asset, String asset_name){
-    //     if (asset != null){
-    //         Gdx.app.log(asset_name,"loaded");
-    //     } else {
-    //         Gdx.app.log(asset_name,"not loaded");
-    //     }
-    // }
-    // private void asset_load(){
-    //     l_asset_manager.load("level_screen.png", Texture.class);
-    //     l_asset_manager.load("back.png", Texture.class);
-    //     l_asset_manager.load("level_number/1.png", Texture.class);
-    //     l_asset_manager.load("level_number/2.png", Texture.class);
-    //     l_asset_manager.load("level_number/3.png", Texture.class);
-    //     l_asset_manager.load("level_number/4.png", Texture.class);
-    //     l_asset_manager.finishLoading();
-    // }
+    private ImageButton l_back_button;
+    private ImageButton l_1_button;
+    private ImageButton l_2_button;
+    private ImageButton l_3_button;
+    private ImageButton l_4_button;
 
-    public level_screen(MyGame game, AssetManager asset_manager) {
-        this.original_game_variable = game;
-        this.l_asset_manager = asset_manager;
-        asset_load();
-        
-        l_batch = new SpriteBatch();
-        l_viewport = new FitViewport(800, 480);
-        
-        l_background = l_asset_manager.get("level_screen.png",Texture.class);
-        l_back = l_asset_manager.get("back.png",Texture.class);
-        l_1 = l_asset_manager.get("level_number/1.png",Texture.class);
-        l_2 = l_asset_manager.get("level_number/2.png",Texture.class);
-        l_3 = l_asset_manager.get("level_number/3.png",Texture.class);
-        l_4 = l_asset_manager.get("level_number/4.png",Texture.class);
-        
-        l_back_button = new ImageButton(new TextureRegionDrawable(new TextureRegion(l_back)));
-        l_1_button = new ImageButton(new TextureRegionDrawable(new TextureRegion(l_1)));
-        l_2_button = new ImageButton(new TextureRegionDrawable(new TextureRegion(l_2)));
-        l_3_button = new ImageButton(new TextureRegionDrawable(new TextureRegion(l_3)));
-        l_4_button = new ImageButton(new TextureRegionDrawable(new TextureRegion(l_4)));
+    public level_screen(MyGame game, AssetManager assetManager) {
+        this.game = game;
+        this.assetManager = assetManager;
 
-        setupListeners();  // Set up the button listeners
-        asset_checker();
+        // Initialize stage and viewport
+        stage = new Stage(new FitViewport(800, 600));
 
-        l_stage = new Stage();
-        l_stage.setViewport(l_viewport);
-
-        // Create a Table for layout
-        table = new Table();
-        table.setFillParent(true);  // Makes table size match the stage
-
-        // Add buttons to the table
-        table.add(l_back_button).top().left().pad(10); // Back button at top-left
-        table.row();  // Move to the next row
-        table.add(l_1_button).center().pad(10);  // Center the buttons
-        table.row();
-        table.add(l_2_button).center().pad(10);
-        table.row();
-        table.add(l_3_button).center().pad(10);
-        table.row();
-        table.add(l_4_button).center().pad(10);
-
-        // Add the table to the stage
-        l_stage.addActor(table);
-
-        // Gdx.input.setInputProcessor(l_stage);  // Make the stage listen for input
+        // Load background from AssetManager (reused from FirstScreen)
+        backgroundTexture = new Texture(Gdx.files.internal("First_Screen_bkg.png"));
+        // Create UI
+        createUI();
     }
 
-    private void setupListeners() {
-        l_back_button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                // original_game_variable.setScreen(new MainMenuScreen(original_game_variable));
-                original_game_variable.setScreen(original_game_variable.loadingScreen);
-                // Change main menu screen
-            }
-        });
-        l_1_button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                // original_game_variable.setScreen(original_game_variable.firstScreen);
-                // Change GameScreen to level 1 screen
-                original_game_variable.setScreen(original_game_variable.loadingScreen);
+    private void createUI() {
+        // Create Table for layout management
+        Table table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
 
-            }
-        });
-        l_2_button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                // original_game_variable.setScreen(original_game_variable.firstScreen);
-                // Change GameScreen to level 1 screen
-                original_game_variable.setScreen(original_game_variable.loadingScreen);
+        // Define the size for buttons
+        float buttonWidth = 100f;
+        float buttonHeight = 100f;
 
-            }
-        });
-        l_3_button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                // original_game_variable.setScreen(original_game_variable.firstScreen);
-                // Change GameScreen to level 1 screen
-                original_game_variable.setScreen(original_game_variable.loadingScreen);
+        // Create buttons
+        l_back_button = createButton("back.png");
+        l_1_button = createButton("level_number/1.png");
+        l_2_button = createButton("level_number/2.png");
+        l_3_button = createButton("level_number/3.png");
+        l_4_button = createButton("level_number/4.png");
 
-            }
-        });
-        l_4_button.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                // original_game_variable.setScreen(original_game_variable.firstScreen);
-                // Change GameScreen to level 1 screen
-                original_game_variable.setScreen(original_game_variable.loadingScreen);
+        // Set button sizes
+        l_back_button.setSize(buttonWidth, buttonHeight);
+        l_1_button.setSize(buttonWidth, buttonHeight);
+        l_2_button.setSize(buttonWidth, buttonHeight);
+        l_3_button.setSize(buttonWidth, buttonHeight);
+        l_4_button.setSize(buttonWidth, buttonHeight);
 
+        // Add click listeners for buttons
+        l_back_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(game.loadingScreen); // Transition to Main Menu or Loading Screen
             }
         });
-     
+        l_1_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(game.loadingScreen); // Load level 1
+            }
+        });
+        l_2_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(game.loadingScreen); // Load level 2
+            }
+        });
+        l_3_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(game.loadingScreen); // Load level 3
+            }
+        });
+        l_4_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(game.loadingScreen); // Load level 4
+            }
+        });
+
+        // Set the table layout for 2x2 button grid and back button at the top-left
+        table.top().left(); // Aligns table at top-left corner
+        table.add(l_back_button).size(buttonWidth, buttonHeight).left().pad(10); // Back button at the top-left
+        table.row(); // Move to the next row
+
+        // Create a 2x2 matrix for the level buttons
+        table.add(l_1_button).size(buttonWidth, buttonHeight).expandX().pad(20); // Level 1 button
+        table.add(l_2_button).size(buttonWidth, buttonHeight).expandX().pad(20); // Level 2 button
+        table.row(); // Move to the next row
+        table.add(l_3_button).size(buttonWidth, buttonHeight).expandX().pad(20); // Level 3 button
+        table.add(l_4_button).size(buttonWidth, buttonHeight).expandX().pad(20); // Level 4 button
     }
-    private void asset_load_check(Object asset, String asset_name){
-        if (asset != null){
-            Gdx.app.log(asset_name,"loaded");
-        } else {
-            Gdx.app.log(asset_name,"not loaded");
-        }
-    }
-    private void asset_checker(){
-        asset_load_check(l_asset_manager, "asset_manager");
-        asset_load_check(l_background, "background_image");
-        asset_load_check(l_back, "back_button_image");
-        asset_load_check(l_1, "level_1_button_image");
-        asset_load_check(l_2, "level_2_button_image");
-        asset_load_check(l_3, "level_3_button_image");
-        asset_load_check(l_4, "level_4_button_image");
-    }
-    private void asset_load(){
-        l_asset_manager.load("level_screen.png", Texture.class);
-        l_asset_manager.load("back.png", Texture.class);
-        l_asset_manager.load("level_number/1.png", Texture.class);
-        l_asset_manager.load("level_number/2.png", Texture.class);
-        l_asset_manager.load("level_number/3.png", Texture.class);
-        l_asset_manager.load("level_number/4.png", Texture.class);
-        l_asset_manager.finishLoading();
-    }
+    // Helper method to create buttons from textures
+    private ImageButton createButton(String texturePath) {
+        Texture texture = new Texture(Gdx.files.internal(texturePath));
+        return new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
 
 
-
-    @Override
-    public void resize(int width, int height) {
-        l_viewport.update(width, height, true);
-        table.invalidateHierarchy();  // Make sure the table updates its layout
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(l_stage);
+        Gdx.input.setInputProcessor(stage);  // Set input to stage
     }
 
     @Override
     public void render(float delta) {
+        // Clear screen and draw background
         ScreenUtils.clear(Color.CYAN);
-        l_viewport.apply();
 
-        l_batch.setProjectionMatrix(l_viewport.getCamera().combined);
-        l_batch.begin();
-        l_batch.draw(l_background, 0, 0, l_viewport.getWorldWidth(), l_viewport.getWorldHeight());
-        l_batch.end();
+        // Begin rendering
+        stage.getBatch().begin();
+        stage.getBatch().draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth() + backgroundTexture.getWidth() , Gdx.graphics.getHeight()+backgroundTexture.getHeight());
+        stage.getBatch().end();
 
-        l_stage.act(delta);
-        l_stage.draw();
+        // Draw stage and handle input
+        stage.act(delta);
+        stage.draw();
     }
 
     @Override
-    public void hide() {}
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
 
     @Override
     public void pause() {}
@@ -201,14 +148,16 @@ public class level_screen implements Screen {
     public void resume() {}
 
     @Override
+    public void hide() {}
+
+    @Override
     public void dispose() {
-        l_batch.dispose();
-        l_background.dispose();
-        l_back.dispose();
-        l_1.dispose();
-        l_2.dispose();
-        l_3.dispose();
-        l_4.dispose();
-        l_stage.dispose();
+        stage.dispose();
+        backgroundTexture.dispose();
+        assetManager.unload("back.png");
+        assetManager.unload("level_number/1.png");
+        assetManager.unload("level_number/2.png");
+        assetManager.unload("level_number/3.png");
+        assetManager.unload("level_number/4.png");
     }
 }

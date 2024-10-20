@@ -75,7 +75,7 @@ public class LoadingScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // Switch to FirstScreen when the start button is clicked
-                game.switchToFirstScreen();
+                game.switch_screen(game.level_screen);
             }
         });
 

@@ -58,13 +58,17 @@ public class LoadingScreen implements Screen {
         viewport = new FitViewport(virtualWidth, VIRTUAL_HEIGHT, camera);
         viewport.apply();
 
-        // Position the buttons
-        float buttonWidth = 100f;
-        float buttonHeight = 40f;
+        // Increase button size
+        float buttonWidth = 150f;
+        float buttonHeight = 60f;
+
+        // Position the "Play" button at the center of the screen
         startButton.setSize(buttonWidth, buttonHeight);
-        startButton.setPosition((viewport.getWorldWidth() - buttonWidth) / 6f, viewport.getWorldHeight() / 16f);
+        startButton.setPosition((viewport.getWorldWidth() - buttonWidth) / 2f, viewport.getWorldHeight() / 5f);
+
+        // Position the "Exit" button below the "Play" button
         exitButton.setSize(buttonWidth, buttonHeight);
-        exitButton.setPosition((2 * (viewport.getWorldWidth() - buttonWidth) / 3f) - 50, viewport.getWorldHeight() / 16f);
+        exitButton.setPosition((viewport.getWorldWidth() - buttonWidth) / 2f, (viewport.getWorldHeight() / 5f) - buttonHeight - 20f);
 
         // Add input listeners to buttons
         startButton.addListener(new ClickListener() {
@@ -83,12 +87,11 @@ public class LoadingScreen implements Screen {
         });
 
         // Set input processor to the stage
-        // Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(stage);
         Gdx.app.log("LoadingScreen", "Loading screen shown");
     }
 
@@ -122,7 +125,6 @@ public class LoadingScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         stage.getViewport().update(width, height, true);
-        // stage.getViewport().  //// addition here
     }
 
     @Override

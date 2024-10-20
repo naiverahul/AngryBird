@@ -128,7 +128,7 @@ public class level_screen implements Screen {
 
         // Begin rendering
         stage.getBatch().begin();
-        stage.getBatch().draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth() + backgroundTexture.getWidth() , Gdx.graphics.getHeight()+backgroundTexture.getHeight());
+        stage.getBatch().draw(backgroundTexture, 0, 0, 1920 , 1080);
         stage.getBatch().end();
 
         // Draw stage and handle input

@@ -26,16 +26,18 @@ public class level_screen implements Screen {
     private ImageButton l_2_button;
     private ImageButton l_3_button;
     private ImageButton l_4_button;
+    private ImageButton settings_button; // New settings button
 
     public level_screen(MyGame game, AssetManager assetManager) {
         this.game = game;
         this.assetManager = assetManager;
 
         // Initialize stage and viewport
-        stage = new Stage(new FitViewport(800, 600));
+        stage = new Stage(new FitViewport(1920, 1080));
 
         // Load background from AssetManager (reused from FirstScreen)
         backgroundTexture = new Texture(Gdx.files.internal("First_Screen_bkg.png"));
+
         // Create UI
         createUI();
     }
@@ -47,8 +49,8 @@ public class level_screen implements Screen {
         stage.addActor(table);
 
         // Define the size for buttons
-        float buttonWidth = 100f;
-        float buttonHeight = 100f;
+        float buttonWidth = 200f;
+        float buttonHeight = 200f;
 
         // Create buttons
         l_back_button = createButton("back.png");
@@ -56,6 +58,7 @@ public class level_screen implements Screen {
         l_2_button = createButton("level_number/2.png");
         l_3_button = createButton("level_number/3.png");
         l_4_button = createButton("level_number/4.png");
+        settings_button = createButton("setting.png");  // Settings button
 
         // Set button sizes
         l_back_button.setSize(buttonWidth, buttonHeight);
@@ -63,6 +66,7 @@ public class level_screen implements Screen {
         l_2_button.setSize(buttonWidth, buttonHeight);
         l_3_button.setSize(buttonWidth, buttonHeight);
         l_4_button.setSize(buttonWidth, buttonHeight);
+        settings_button.setSize(80f, 80f);  // Slightly smaller size for settings button
 
         // Add click listeners for buttons
         l_back_button.addListener(new ClickListener() {
@@ -95,6 +99,13 @@ public class level_screen implements Screen {
                 game.setScreen(game.loadingScreen); // Load level 4
             }
         });
+        settings_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Implement settings screen transition
+                game.setScreen(game.loadingScreen);
+            }
+        });
 
         // Set the table layout for 2x2 button grid and back button at the top-left
         table.top().left(); // Aligns table at top-left corner
@@ -107,13 +118,16 @@ public class level_screen implements Screen {
         table.row(); // Move to the next row
         table.add(l_3_button).size(buttonWidth, buttonHeight).expandX().pad(20); // Level 3 button
         table.add(l_4_button).size(buttonWidth, buttonHeight).expandX().pad(20); // Level 4 button
+
+        // Add settings button to bottom-left, outside of the main table layout
+        table.row();
+        table.add(settings_button).size(200f, 200f).expand().bottom().left().pad(10);  // Settings button
     }
+
     // Helper method to create buttons from textures
     private ImageButton createButton(String texturePath) {
         Texture texture = new Texture(Gdx.files.internal(texturePath));
         return new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
-
-
     }
 
     @Override
@@ -128,7 +142,8 @@ public class level_screen implements Screen {
 
         // Begin rendering
         stage.getBatch().begin();
-        stage.getBatch().draw(backgroundTexture, 0, 0, 1920 , 1080);
+        // Draw background texture in full screen
+        stage.getBatch().draw(backgroundTexture, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
         stage.getBatch().end();
 
         // Draw stage and handle input
@@ -159,5 +174,6 @@ public class level_screen implements Screen {
         assetManager.unload("level_number/2.png");
         assetManager.unload("level_number/3.png");
         assetManager.unload("level_number/4.png");
+        assetManager.unload("settings.png");
     }
 }

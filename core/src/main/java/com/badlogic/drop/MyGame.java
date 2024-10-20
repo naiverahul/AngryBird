@@ -8,6 +8,7 @@ public class MyGame extends Game {
     protected FirstScreen firstScreen;
     protected LoadingScreen loadingScreen;
     protected level_screen level_screen;
+    protected level_screen pause_screen;
     private AssetManager assetManager;
 
     @Override
@@ -18,13 +19,16 @@ public class MyGame extends Game {
         loadingScreen = new LoadingScreen(this, assetManager);
         firstScreen = new FirstScreen(this);
         level_screen = new level_screen(this, assetManager);
-        setScreen(loadingScreen);
+        pause_screen = level_screen;
+        // setScreen(loadingScreen);
         // setScreen(level_screen);
+        switch_screen(loadingScreen);
     }
 
-    public void switchToFirstScreen() {
+    public void switch_screen(Screen target_screen) {
         // setScreen(firstScreen);
-        setScreen(level_screen);
+        // setScreen(level_screen);
+        setScreen(target_screen);
     }
 
     @Override

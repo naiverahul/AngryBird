@@ -27,6 +27,8 @@ public class level_screen implements Screen {
     private ImageButton l_3_button;
     private ImageButton l_4_button;
 
+    private game_screen l_game_screen;
+
     public level_screen(MyGame game, AssetManager assetManager) {
         this.game = game;
         this.assetManager = assetManager;
@@ -37,6 +39,7 @@ public class level_screen implements Screen {
         // Load background from AssetManager (reused from FirstScreen)
         backgroundTexture = new Texture(Gdx.files.internal("First_Screen_bkg.png"));
         // Create UI
+        l_game_screen = new game_screen(game, assetManager);
         createUI();
     }
 
@@ -68,31 +71,40 @@ public class level_screen implements Screen {
         l_back_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.loadingScreen); // Transition to Main Menu or Loading Screen
+                // game.setScreen(game.loadingScreen); // Transition to Main Menu or Loading Screen
+                game.switch_screen(game.loadingScreen);
             }
         });
         l_1_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.loadingScreen); // Load level 1
+                // game.setScreen(game.loadingScreen); // Load level 1
+                // game.setScreen(l_game_screen);
+                game.switch_screen(l_game_screen);
             }
         });
         l_2_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.loadingScreen); // Load level 2
+                // game.setScreen(game.loadingScreen); // Load level 2
+                // game.setScreen(l_game_screen);
+                game.switch_screen(l_game_screen);
             }
         });
         l_3_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.loadingScreen); // Load level 3
+                // game.setScreen(game.loadingScreen); // Load level 3
+                // game.setScreen(l_game_screen);
+                game.switch_screen(l_game_screen);
             }
         });
         l_4_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.loadingScreen); // Load level 4
+                // game.setScreen(game.loadingScreen); // Load level 4
+                // game.setScreen(l_game_screen);
+                game.switch_screen(l_game_screen);
             }
         });
 

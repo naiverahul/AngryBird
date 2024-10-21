@@ -64,7 +64,7 @@ public class level_screen implements Screen {
         settings_button = createButton("setting.png");  // Settings button
 
         // Set button sizes
-        l_back_button.setSize(buttonWidth, buttonHeight);
+        l_back_button.setSize(10f, 10f);
         l_1_button.setSize(buttonWidth, buttonHeight);
         l_2_button.setSize(buttonWidth, buttonHeight);
         l_3_button.setSize(buttonWidth, buttonHeight);
@@ -75,8 +75,7 @@ public class level_screen implements Screen {
         l_back_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // game.setScreen(game.loadingScreen); // Transition to Main Menu or Loading Screen
-                game.switch_screen(game.loadingScreen);
+                 game.setScreen(game.loadingScreen); // Transition to Main Menu or Loading Screen
             }
         });
         l_1_button.addListener(new ClickListener() {
@@ -115,7 +114,7 @@ public class level_screen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // Implement settings screen transition
-                game.setScreen(game.loadingScreen);
+                game.setScreen(game.settingsScreen);
             }
         });
 

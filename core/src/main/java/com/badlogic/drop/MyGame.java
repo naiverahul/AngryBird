@@ -9,6 +9,7 @@ public class MyGame extends Game {
     protected LoadingScreen loadingScreen;
     protected level_screen level_screen;
     protected level_screen pause_screen;
+    protected SettingsScreen settingsScreen;
     private AssetManager assetManager;
 
     @Override
@@ -19,6 +20,7 @@ public class MyGame extends Game {
         loadingScreen = new LoadingScreen(this, assetManager);
         firstScreen = new FirstScreen(this);
         level_screen = new level_screen(this, assetManager);
+        settingsScreen = new SettingsScreen();
         pause_screen = level_screen;
         // setScreen(loadingScreen);
         // setScreen(level_screen);
@@ -41,6 +43,7 @@ public class MyGame extends Game {
         if (loadingScreen != null) loadingScreen.dispose();
         if (firstScreen != null) firstScreen.dispose();
         if (level_screen != null) level_screen.dispose();
+        if(settingsScreen != null) settingsScreen.dispose();
         assetManager.dispose();
     }
 }

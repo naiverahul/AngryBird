@@ -50,8 +50,7 @@ public class LoadingScreen implements Screen {
         // Add buttons to the stage
         stage.addActor(startButton);
         stage.addActor(exitButton);
-
-        // Initialize the camera and viewport
+// Initialize the camera and viewport
         camera = new OrthographicCamera();
         float aspectRatio = (float) Gdx.graphics.getWidth() / Gdx.graphics.getHeight();
         float virtualWidth = VIRTUAL_HEIGHT * aspectRatio;
@@ -59,16 +58,16 @@ public class LoadingScreen implements Screen {
         viewport.apply();
 
         // Increase button size
-        float buttonWidth = 150f;
-        float buttonHeight = 60f;
+        float buttonWidth = 250f;
+        float buttonHeight = 140f;
 
         // Position the "Play" button at the center of the screen
         startButton.setSize(buttonWidth, buttonHeight);
-        startButton.setPosition((viewport.getWorldWidth() - buttonWidth) / 2f, viewport.getWorldHeight() / 5f);
+        startButton.setPosition(850f, viewport.getWorldHeight() / 18f);
 
         // Position the "Exit" button below the "Play" button
         exitButton.setSize(buttonWidth, buttonHeight);
-        exitButton.setPosition((viewport.getWorldWidth() - buttonWidth) / 2f, (viewport.getWorldHeight() / 5f) - buttonHeight - 20f);
+        exitButton.setPosition(0, 0);
 
         // Add input listeners to buttons
         startButton.addListener(new ClickListener() {
@@ -110,8 +109,8 @@ public class LoadingScreen implements Screen {
         // Draw the loading texture
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        float imageWidth = 700f;
-        float imageHeight = 500f;
+        float imageWidth = 1440f;
+        float imageHeight = 765f;
         float x = (viewport.getWorldWidth() - imageWidth) / 2f;
         float y = (viewport.getWorldHeight() - imageHeight) / 2f;
         batch.draw(loadingTexture, x, y, imageWidth, imageHeight);

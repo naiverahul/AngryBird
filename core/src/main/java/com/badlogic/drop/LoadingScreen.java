@@ -19,6 +19,7 @@ public class LoadingScreen implements Screen {
     private AssetManager assetManager;
     private SpriteBatch batch;
     private Texture loadingTexture;
+    @SuppressWarnings("unused")
     private MyGame game;  // Reference to MyGame to switch screens
 
     private Texture startButtonTexture;

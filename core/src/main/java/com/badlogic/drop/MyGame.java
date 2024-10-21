@@ -5,7 +5,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 
 public class MyGame extends Game {
-    protected FirstScreen firstScreen;
+    // protected FirstScreen firstScreen;
     protected LoadingScreen loadingScreen;
     protected level_screen level_screen;
     protected level_screen pause_screen;
@@ -18,7 +18,7 @@ public class MyGame extends Game {
 
         // Create instances of your screens
         loadingScreen = new LoadingScreen(this, assetManager);
-        firstScreen = new FirstScreen(this);
+        // firstScreen = new FirstScreen(this);
         level_screen = new level_screen(this, assetManager);
         settingsScreen = new SettingsScreen();
         pause_screen = level_screen;
@@ -41,7 +41,7 @@ public class MyGame extends Game {
     @Override
     public void dispose() {
         if (loadingScreen != null) loadingScreen.dispose();
-        if (firstScreen != null) firstScreen.dispose();
+        // if (firstScreen != null) firstScreen.dispose();
         if (level_screen != null) level_screen.dispose();
         if(settingsScreen != null) settingsScreen.dispose();
         assetManager.dispose();

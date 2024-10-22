@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class game_screen implements Screen {
-    private final MyGame orginal_game_variable;
+    private MyGame orginal_game_variable;
     private Stage stage;
     private FitViewport viewport;
     private Texture game_background;
@@ -70,13 +70,14 @@ public class game_screen implements Screen {
             }
         });
         backbutton.addListener(new ClickListener() {
-
-            level_screen new_level_screen = new level_screen(orginal_game_variable);
-
-
-
-        }
-        );
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                orginal_game_variable.level_screen.dispose();
+                level_screen new_Level_screen = new level_screen(orginal_game_variable);
+                orginal_game_variable.level_screen = new_Level_screen;
+                orginal_game_variable.setScreen(new_Level_screen);
+            }
+        });
 
 
         table.add(catapultButton).size(300f, 300f).expand().bottom().pad(100f).left().pad(100f);

@@ -171,10 +171,12 @@ public class game_screen implements Screen {
 
         // Draw the current bird scaled down on the catapult
         if (currentBird != null) {
-            float birdWidth = currentBird.getTexture().getWidth() * 0.5f;  // Reduce size to 50%
-            float birdHeight = currentBird.getTexture().getHeight() * 0.5f; // Reduce size to 50%
-            stage.getBatch().draw(currentBird.getTexture(), catapultButton.getX(), catapultButton.getY(), birdWidth, birdHeight);
+            float birdWidth = currentBird.getTexture().getWidth() * 0.25f;  
+            float birdHeight = currentBird.getTexture().getHeight() * 0.25f; 
+            stage.getBatch().draw(currentBird.getTexture(), catapultButton.getX()+50f, catapultButton.getY()+150f, birdWidth, birdHeight);
         }
+
+
 
         stage.getBatch().end();
 

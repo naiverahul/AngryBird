@@ -10,6 +10,7 @@ public class MyGame extends Game {
     protected level_screen level_screen;
     protected level_screen pause_screen;
     protected SettingsScreen settingsScreen;
+    protected game_screen game_screen;
     private AssetManager assetManager;
 
     @Override
@@ -21,6 +22,7 @@ public class MyGame extends Game {
         // firstScreen = new FirstScreen(this);
         level_screen = new level_screen(this, assetManager);
         settingsScreen = new SettingsScreen();
+        game_screen = new game_screen(this);
         pause_screen = level_screen;
         // setScreen(loadingScreen);
         // setScreen(level_screen);

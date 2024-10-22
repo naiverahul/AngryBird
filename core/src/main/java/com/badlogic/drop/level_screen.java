@@ -26,7 +26,7 @@
 //     private ImageButton l_2_button;
 //     private ImageButton l_3_button;
 //     private ImageButton l_4_button;
-//     private ImageButton settings_button; // New settings button
+//     private ImageButton l_settings_button; // New settings button
 
 //     private game_screen l_game_screen;
 
@@ -61,7 +61,7 @@
 //         l_2_button = createButton("level_number/2.png");
 //         l_3_button = createButton("level_number/3.png");
 //         l_4_button = createButton("level_number/4.png");
-//         settings_button = createButton("setting.png");  // Settings button
+//         l_settings_button = createButton("setting.png");  // Settings button
 
 //         // Set button sizes
 //         l_back_button.setSize(10f, 10f);
@@ -69,7 +69,7 @@
 //         l_2_button.setSize(buttonWidth, buttonHeight);
 //         l_3_button.setSize(buttonWidth, buttonHeight);
 //         l_4_button.setSize(buttonWidth, buttonHeight);
-//         settings_button.setSize(80f, 80f);  // Slightly smaller size for settings button
+//         l_settings_button.setSize(80f, 80f);  // Slightly smaller size for settings button
 
 //         // Add click listeners for buttons
 //         l_back_button.addListener(new ClickListener() {
@@ -110,7 +110,7 @@
 //                 game.switch_screen(l_game_screen);
 //             }
 //         });
-//         settings_button.addListener(new ClickListener() {
+//         l_settings_button.addListener(new ClickListener() {
 //             @Override
 //             public void clicked(InputEvent event, float x, float y) {
 //                 // Implement settings screen transition
@@ -132,7 +132,7 @@
 
 //         // Add settings button to bottom-left, outside of the main table layout
 //         table.row();
-//         table.add(settings_button).size(200f, 200f).expand().bottom().left().pad(10);  // Settings button
+//         table.add(l_settings_button).size(200f, 200f).expand().bottom().left().pad(10);  // Settings button
 //     }
 
 //     // Helper method to create buttons from textures
@@ -212,7 +212,7 @@ public class level_screen implements Screen {
     private Stage stage;
     private AssetManager assetManager;
     private Texture backgroundTexture;
-    private ImageButton l_back_button, l_1_button, l_2_button, l_3_button, l_4_button, settings_button;
+    private ImageButton l_back_button, l_1_button, l_2_button, l_3_button, l_4_button, l_settings_button;
     private game_screen l_game_screen;
 
     public level_screen(MyGame game, AssetManager assetManager) {
@@ -238,35 +238,48 @@ public class level_screen implements Screen {
         l_2_button = createButton("level_number/2.png");
         l_3_button = createButton("level_number/3.png");
         l_4_button = createButton("level_number/4.png");
-        settings_button = createButton("setting.png");
+        l_settings_button = createButton("setting.png");
 
         l_back_button.setSize(10f, 10f);
         l_1_button.setSize(buttonWidth, buttonHeight);
         l_2_button.setSize(buttonWidth, buttonHeight);
         l_3_button.setSize(buttonWidth, buttonHeight);
         l_4_button.setSize(buttonWidth, buttonHeight);
-        settings_button.setSize(80f, 80f);
+        l_settings_button.setSize(80f, 80f);
 
         l_back_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.loadingScreen); // Back to loading or main screen
+                game.loadingScreen.dispose();
+                LoadingScreen new_loading_screen = new LoadingScreen(game, assetManager);
+                game.loadingScreen = new_loading_screen;
+                game.setScreen(new_loading_screen);
             }
         });
 
-        l_1_button.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.switch_screen(l_game_screen);
-            }
-        });
+        // l_1_button.addListener(new ClickListener() {
+        //     @Override
+        //     public void clicked(InputEvent event, float x, float y) {
+        //         game.switch_screen(l_game_screen);
+        //     }
+        // });
+        l_level_button_listener(l_1_button);
+        l_level_button_listener(l_2_button);
+        l_level_button_listener(l_3_button);
+        l_level_button_listener(l_4_button);
 
-        settings_button.addListener(new ClickListener() {
+        l_settings_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.settingsScreen); // Navigate to settings
+                game.settingsScreen.dispose();
+                SettingsScreen new_settings_screen = new SettingsScreen();
+                game.settingsScreen = new_settings_screen;
+                game.setScreen(new_settings_screen);
             }
         });
+        
+        
+
 
         table.top().left();
         table.add(l_back_button).size(buttonWidth, buttonHeight).left().pad(10);
@@ -277,14 +290,24 @@ public class level_screen implements Screen {
         table.add(l_3_button).size(buttonWidth, buttonHeight).expandX().pad(20);
         table.add(l_4_button).size(buttonWidth, buttonHeight).expandX().pad(20);
         table.row();
-        table.add(settings_button).size(200f, 200f).expand().bottom().left().pad(10);
+        table.add(l_settings_button).size(200f, 200f).expand().bottom().left().pad(10);
     }
 
     private ImageButton createButton(String texturePath) {
         Texture texture = new Texture(Gdx.files.internal(texturePath));
         return new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
     }
-
+    private void l_level_button_listener(ImageButton button) {
+        button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.game_screen.dispose();
+                game_screen new_game_screen = new game_screen(game);
+                game.game_screen = new_game_screen;
+                game.setScreen(new_game_screen);
+            }
+        });
+    }
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);

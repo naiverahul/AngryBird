@@ -144,9 +144,10 @@ public class SettingsScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Code to navigate back to the previous screen
-                // For example:
-                // game.setScreen(new MainMenuScreen(game));
+                game.settingsScreen.dispose();
+                level_screen new_level_screen = new level_screen(game);
+                game.level_screen = new_level_screen;
+                game.switch_screen(new_level_screen);
             }
         });
 
@@ -207,5 +208,6 @@ public class SettingsScreen implements Screen {
         stage.dispose();  // Dispose of stage resources
         font.dispose();
         batch.dispose();
+
     }
 }

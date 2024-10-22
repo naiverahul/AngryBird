@@ -251,7 +251,7 @@ public class level_screen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.loadingScreen.dispose();
-                LoadingScreen new_loading_screen = new LoadingScreen(game, assetManager);
+                LoadingScreen new_loading_screen = new LoadingScreen(game, game.assetManager);
                 game.loadingScreen = new_loading_screen;
                 game.setScreen(new_loading_screen);
             }

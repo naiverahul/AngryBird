@@ -11,7 +11,7 @@ public class MyGame extends Game {
     protected level_screen pause_screen;
     protected SettingsScreen settingsScreen;
     protected game_screen game_screen;
-    private AssetManager assetManager;
+    protected AssetManager assetManager;
 
     @Override
     public void create() {

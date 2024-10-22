@@ -54,21 +54,57 @@ public class game_screen implements Screen {
         birdQueue.add(new Birdparentclass("blackbird","Birdimages/blackbird.png", 15, 8));
     }
 
+    // private void setupUI() {
+    //     Table table = new Table();
+    //     table.debug(Table.Debug.all);
+    //     table.setFillParent(true);
+    //     stage.addActor(table);
+
+    //     this.catapultButton = createButton("catapult.png");
+    //     this.pausebutton = createButton("pause.png");
+    //     this.backbutton = createButton("back.png");
+    //     catapultButton.addListener(new ClickListener() {
+    //         @Override
+    //         public void clicked(InputEvent event, float x, float y) {
+    //             launchBird();
+    //         }
+    //     });   
+    //     backbutton.addListener(new ClickListener() {
+    //         @Override
+    //         public void clicked(InputEvent event, float x, float y) {
+    //             orginal_game_variable.level_screen.dispose();
+    //             level_screen new_Level_screen = new level_screen(orginal_game_variable);
+    //             orginal_game_variable.level_screen = new_Level_screen;
+    //             orginal_game_variable.setScreen(new_Level_screen);
+    //         }
+    //     });
+
+
+    //     table.add(catapultButton).size(200f, 200f).expand().bottom().pad(100f).left().pad(100f);
+    //     table.padBottom(50f);
+    //     table.add(backbutton).size(200f, 200f).expand().top().pad(25f).left().pad(25f);
+    //     table.row();
+    //     table.add(pausebutton).size(200f, 200f).expand().top().pad(25f).right().pad(25f);
+    // }
+
+
     private void setupUI() {
         Table table = new Table();
         table.debug(Table.Debug.all);
         table.setFillParent(true);
         stage.addActor(table);
-
+    
         this.catapultButton = createButton("catapult.png");
         this.pausebutton = createButton("pause.png");
         this.backbutton = createButton("back.png");
+    
         catapultButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 launchBird();
             }
         });
+    
         backbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -78,12 +114,22 @@ public class game_screen implements Screen {
                 orginal_game_variable.setScreen(new_Level_screen);
             }
         });
-
-
-        table.add(catapultButton).size(300f, 300f).expand().bottom().pad(100f).left().pad(100f);
-        table.padBottom(50f);
-        table.add(pausebutton).size(300f, 300f).expand().top().pad(25f).right().pad(25f);
+    
+        // Positioning buttons
+        // Back button at the top-left corner
+        table.add(backbutton).size(100f, 100f).expand().top().left().pad(20f);
+        
+        // Pause button at the top-right corner
+        table.add(pausebutton).size(100f, 100f).top().right().pad(20f);
+    
+        table.row();
+        
+        // Catapult button at the bottom-left corner
+        table.add(catapultButton).size(200f, 200f).bottom().left().pad(100f);
     }
+    
+    
+
 
     private ImageButton createButton(String texturePath) {
         Texture texture = new Texture(Gdx.files.internal(texturePath));
@@ -107,23 +153,25 @@ public class game_screen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.SKY);
-
+    
         // Begin drawing
         stage.getBatch().begin();
         stage.getBatch().draw(game_background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-
-        // Draw the current bird in the slingshot
+    
+        // Draw the current bird scaled down on the catapult
         if (currentBird != null) {
-            stage.getBatch().draw(currentBird.getTexture(),catapultButton.getX(),catapultButton.getY());
+            float birdWidth = currentBird.getTexture().getWidth() * 0.5f;  // Reduce size to 50%
+            float birdHeight = currentBird.getTexture().getHeight() * 0.5f; // Reduce size to 50%
+            stage.getBatch().draw(currentBird.getTexture(), catapultButton.getX(), catapultButton.getY(), birdWidth, birdHeight);
         }
-
-
+    
         stage.getBatch().end();
-
+    
         // Stage needs to act and draw UI elements
         stage.act(delta);
         stage.draw();
     }
+    
 
     @Override
     public void resize(int width, int height) {
@@ -153,7 +201,8 @@ public class game_screen implements Screen {
 
     @Override
     public void hide() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'hide'");
+        // // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method 'hide'");
+        
     }
 }

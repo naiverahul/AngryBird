@@ -108,6 +108,7 @@ public class game_screen implements Screen {
         backbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+
                 orginal_game_variable.level_screen.dispose();
                 level_screen new_Level_screen = new level_screen(orginal_game_variable);
                 orginal_game_variable.level_screen = new_Level_screen;

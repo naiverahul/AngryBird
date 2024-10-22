@@ -250,6 +250,7 @@ public class level_screen implements Screen {
         l_back_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
                 game.loadingScreen.dispose();
                 LoadingScreen new_loading_screen = new LoadingScreen(game, game.assetManager);
                 game.loadingScreen = new_loading_screen;
@@ -260,6 +261,8 @@ public class level_screen implements Screen {
         l_settings_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+
                 game.settingsScreen.dispose();
                 SettingsScreen new_settings_screen = new SettingsScreen(game);
                 game.settingsScreen = new_settings_screen;
@@ -295,6 +298,7 @@ public class level_screen implements Screen {
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
                 game.game_screen.dispose();
                 game_screen new_game_screen = new game_screen(game);
                 game.game_screen = new_game_screen;

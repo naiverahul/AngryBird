@@ -16,6 +16,7 @@ public class MyGame extends Game {
     protected game_screen game_screen;
     protected AssetManager assetManager;
     protected Music bkgmusic;
+    protected Music clicksound;
 
     @Override
     public void create() {
@@ -34,6 +35,7 @@ public class MyGame extends Game {
         bkgmusic.play();
         // setScreen(loadingScreen);
         // setScreen(level_screen);
+        clicksound = Gdx.audio.newMusic(Gdx.files.internal("clicksound.mp3"));
         switch_screen(loadingScreen);
     }
 

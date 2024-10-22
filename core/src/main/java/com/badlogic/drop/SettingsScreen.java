@@ -102,6 +102,8 @@ public class SettingsScreen implements Screen {
         soundButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+
 
                 if (soundButton.getText().toString().equals("Sound: ON")) {
                     soundButton.setText("Sound: OFF");
@@ -117,6 +119,8 @@ public class SettingsScreen implements Screen {
         graphicsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+
                 String currentText = graphicsButton.getText().toString();
                 if (currentText.equals("Graphics: HIGH")) {
                     graphicsButton.setText("Graphics: MEDIUM");
@@ -132,6 +136,8 @@ public class SettingsScreen implements Screen {
         controlsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+
                 if (controlsButton.getText().toString().equals("Controls: SIMPLE")) {
                     controlsButton.setText("Controls: ADVANCED");
                 } else {
@@ -144,6 +150,8 @@ public class SettingsScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+
                 game.settingsScreen.dispose();
                 level_screen new_level_screen = new level_screen(game);
                 game.level_screen = new_level_screen;

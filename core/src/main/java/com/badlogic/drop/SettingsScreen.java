@@ -59,6 +59,7 @@ public class SettingsScreen implements Screen {
 
     private void createUI() {
         table = new Table();
+        table.debug(Table.Debug.all);
         table.setFillParent(true);  // Make the table fill the screen
         table.top().padTop(300);    // Add padding to position it lower from the top
 
@@ -86,7 +87,7 @@ public class SettingsScreen implements Screen {
         TextButton backButton = new TextButton("Back", buttonStyle);
 
         // Add buttons to the table
-        table.add(soundButton).pad(15).width(300).height(200);
+        table.add(soundButton).pad(15).width(250).height(200);
         table.row();
         table.add(graphicsButton).pad(15).width(300).height(200);
         table.row();
@@ -110,7 +111,7 @@ public class SettingsScreen implements Screen {
         batch.end();
 
         stage.act(delta);  // Update the stage
-        stage.draw();      // Draw the stage
+        stage.draw();
     }
 
     @Override

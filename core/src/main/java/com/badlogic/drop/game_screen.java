@@ -7,6 +7,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -26,6 +27,9 @@ public class game_screen implements Screen {
     private Texture game_background;
     private Queue<Birdparentclass> birdQueue;
     private Birdparentclass currentBird;
+    private ImageButton catapultButton;
+    private ImageButton pausebutton;
+    private ImageButton backbutton;
 
     public game_screen(MyGame game) {
         this.orginal_game_variable = game;
@@ -33,13 +37,15 @@ public class game_screen implements Screen {
         this.stage = new Stage(viewport);
         this.game_background = new Texture(Gdx.files.internal("game_screen.png"));
         this.birdQueue = new LinkedList<>();
-        
+
         initBirds();
         setupUI();
-        
+
         // Start with the first bird in the queue
         this.currentBird = birdQueue.peek();
     }
+
+
 
     private void initBirds() {
         birdQueue.add(new Birdparentclass("bigbird","Birdimages/bigbird.png", 10, 5));
@@ -50,18 +56,32 @@ public class game_screen implements Screen {
 
     private void setupUI() {
         Table table = new Table();
+        table.debug(Table.Debug.all);
         table.setFillParent(true);
         stage.addActor(table);
 
-        ImageButton catapultButton = createButton("catapult.png");
+        this.catapultButton = createButton("catapult.png");
+        this.pausebutton = createButton("pause.png");
+        this.backbutton = createButton("back.png");
         catapultButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 launchBird();
             }
         });
+        backbutton.addListener(new ClickListener() {
 
-        table.add(catapultButton).size(200, 200).center();
+            level_screen new_level_screen = new level_screen(orginal_game_variable);
+
+
+
+        }
+        );
+
+
+        table.add(catapultButton).size(300f, 300f).expand().bottom().pad(100f).left().pad(100f);
+        table.padBottom(50f);
+        table.add(pausebutton).size(300f, 300f).expand().top().pad(25f).right().pad(25f);
     }
 
     private ImageButton createButton(String texturePath) {
@@ -93,8 +113,9 @@ public class game_screen implements Screen {
 
         // Draw the current bird in the slingshot
         if (currentBird != null) {
-            stage.getBatch().draw(currentBird.getTexture(), 800, 100, 100, 100);  // Adjust position and size as needed
+            stage.getBatch().draw(currentBird.getTexture(),catapultButton.getX(),catapultButton.getY());
         }
+
 
         stage.getBatch().end();
 

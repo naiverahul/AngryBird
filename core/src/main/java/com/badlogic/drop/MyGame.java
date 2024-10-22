@@ -11,7 +11,8 @@ public class MyGame extends Game {
     // protected FirstScreen firstScreen;
     protected LoadingScreen loadingScreen;
     protected level_screen level_screen;
-    protected level_screen pause_screen;
+    // protected level_screen pause_screen;
+    protected pause_screen pause_screen;
     protected SettingsScreen settingsScreen;
     protected game_screen game_screen;
     protected AssetManager assetManager;
@@ -28,7 +29,8 @@ public class MyGame extends Game {
         level_screen = new level_screen(this);
         settingsScreen = new SettingsScreen(this);
         game_screen = new game_screen(this);
-        pause_screen = level_screen;
+        // pause_screen = level_screen;
+        pause_screen = new pause_screen(this);
         bkgmusic = Gdx.audio.newMusic(Gdx.files.internal("angry_birds.mp3"));
         bkgmusic.setLooping(true);
         bkgmusic.setVolume(0.2f);

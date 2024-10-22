@@ -262,11 +262,9 @@ public class level_screen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.clicksound.play();
-
                 game.settingsScreen.dispose();
-                SettingsScreen new_settings_screen = new SettingsScreen(game);
-                game.settingsScreen = new_settings_screen;
-                game.setScreen(new_settings_screen);
+                game.settingsScreen = new SettingsScreen(game);
+                game.setScreen(game.settingsScreen);
             }
         });
 

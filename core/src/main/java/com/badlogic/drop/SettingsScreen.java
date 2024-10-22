@@ -91,10 +91,14 @@ public class SettingsScreen implements Screen {
         buttonStyle.font = buttonFont;
 
         // Create buttons with the new style
-        final TextButton soundButton = new TextButton("Sound: ON", buttonStyle);
-        final TextButton graphicsButton = new TextButton("Graphics: HIGH", buttonStyle);
-        final TextButton controlsButton = new TextButton("Controls: SIMPLE", buttonStyle);
-        final TextButton backButton = new TextButton("Back", buttonStyle);
+        // final TextButton soundButton = new TextButton("Sound: ON", buttonStyle);
+        TextButton soundButton = new TextButton("Sound: ON", buttonStyle);
+        // final TextButton graphicsButton = new TextButton("Graphics: HIGH", buttonStyle);
+        TextButton graphicsButton = new TextButton("Graphics: HIGH", buttonStyle);
+        // final TextButton controlsButton = new TextButton("Controls: SIMPLE", buttonStyle);
+        TextButton controlsButton = new TextButton("Controls: SIMPLE", buttonStyle);
+        // final TextButton backButton = new TextButton("Back", buttonStyle);
+        TextButton backButton = new TextButton("Back", buttonStyle);
 
         // Add listeners to each button
 
@@ -155,7 +159,7 @@ public class SettingsScreen implements Screen {
                 game.settingsScreen.dispose();
                 level_screen new_level_screen = new level_screen(game);
                 game.level_screen = new_level_screen;
-                game.switch_screen(new_level_screen);
+                game.setScreen(game.level_screen);
             }
         });
 

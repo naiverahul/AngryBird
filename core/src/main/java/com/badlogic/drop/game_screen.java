@@ -98,6 +98,16 @@ public class game_screen implements Screen {
         this.pausebutton = createButton("pause.png");
         this.backbutton = createButton("back.png");
 
+        pausebutton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                orginal_game_variable.pause_screen.dispose();
+                pause_screen new_Pause_screen = new pause_screen(orginal_game_variable);
+                orginal_game_variable.pause_screen = new_Pause_screen;
+                orginal_game_variable.setScreen(new_Pause_screen);
+            }
+        });
+
         catapultButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

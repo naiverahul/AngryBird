@@ -2,84 +2,135 @@ package com.badlogic.drop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class pause_screen implements Screen {
-    private AssetManager p_asset_manager;
-    private MyGame orignal_game_variable;
-    private Stage p_stage;
-    private ImageButton p_resume_button, p_menu_button, p_exit_button;
+    private Stage stage;
+    private FitViewport viewport;
+    private MyGame game;
+    private ImageButton resumeButton;
+    private ImageButton mainMenuButton;
+    private ImageButton restartButton;
+    private Texture backgroundTexture;
+    private ImageButton greeting_bird;
 
+    public pause_screen(MyGame game) {
+        this.game = game;
+        this.viewport = new FitViewport(1920, 1080);
+        this.stage = new Stage(viewport);
 
-    public pause_screen(MyGame game, AssetManager asset_manager) {
-        p_asset_manager = asset_manager;
-        orignal_game_variable = game;
-        p_stage = new Stage(new FitViewport(1920,1080));
-        Gdx.input.setInputProcessor(p_stage);
+        backgroundTexture = new Texture(Gdx.files.internal("pause_background.png")); // Optional: semi-transparent background
+        greeting_bird = createButton("chuck.png");
+        greeting_bird.setPosition(
+            Gdx.graphics.getWidth() - greeting_bird.getWidth() - 20, // 20px padding from the right
+            20 // 20px padding from the bottom
+        );
+        stage.addActor(greeting_bird);
+        setupUI();
+    }
+
+    private void setupUI() {
         Table table = new Table();
         table.setFillParent(true);
-        p_stage.addActor(table);
-        // p_resume_button = new ImageButton(new NinePatchDrawable(new NinePatch(new Texture("resume_button.png"), 10, 10, 10, 10)));
-        // p_menu_button = new ImageButton(new NinePatchDrawable(new NinePatch(new Texture("menu_button.png"), 10, 10, 10, 10)));
-        // p_exit_button = new ImageButton(new NinePatchDrawable(new NinePatch(new Texture("exit_button.png"), 10, 10, 10, 10)));
-        table.add(p_resume_button).pad(10);
-        table.row();
-        table.add(p_menu_button).pad(10);
-        table.row();
-        table.add(p_exit_button).pad(10);
+        stage.addActor(table);
+
+        resumeButton = createButton("resume_button.png");
+        mainMenuButton = createButton("close.png");
+        restartButton = createButton("restart_button.png");
+
+        // Resume button functionality
+        resumeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+                game.setScreen(game.game_screen); // Resume the game by returning to the game screen
+            }
+        });
+
+        // Main Menu button functionality
+        mainMenuButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+                game.setScreen(new level_screen(game)); // Switch to the main menu
+            }
+        });
+
+        // Restart button functionality
+        restartButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.clicksound.play();
+                game.game_screen.dispose(); // Dispose of the game screen
+                game.game_screen = new game_screen(game); // Create a new game screen
+                game.setScreen(game.game_screen); // Restart the game
+            }
+        });
+
+        table.add(resumeButton).size(200f, 100f).padBottom(20f);
+        table.add(mainMenuButton).size(200f, 100f).padBottom(20f);
+        table.add(restartButton).size(200f, 100f).padBottom(20f);
+        table.debug();
+
+        greeting_bird.setPosition(
+            Gdx.graphics.getWidth() - greeting_bird.getWidth() - 20, // 20px padding from the right
+            20 // 20px padding from the bottom
+        );
+    }
+
+    private ImageButton createButton(String texturePath) {
+        Texture texture = new Texture(Gdx.files.internal(texturePath));
+        return new ImageButton(new TextureRegionDrawable(texture));
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(p_stage);
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        p_stage.act();
-        p_stage.draw();
+        // Render the game screen underneath (without updating it)
+        // game.game_screen.render(delta); // Ensures the game screen is visible underneath
+
+        stage.getBatch().begin();
+        stage.getBatch().setColor(Color.CYAN); // Optional: Set transparency
+        stage.getBatch().draw(backgroundTexture, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        stage.getBatch().end();
+
+        // Draw the UI on top
+        stage.act(delta);
+        stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        // // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'resize'");
+        viewport.update(width, height, true);
     }
 
     @Override
     public void pause() {
-        // // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
 
     @Override
     public void resume() {
-        // // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'resume'");
     }
 
     @Override
     public void hide() {
-        // // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'hide'");
     }
 
     @Override
     public void dispose() {
-        // // TODO Auto-generated method stub
-        // throw new UnsupportedOperationException("Unimplemented method 'dispose'");
+        stage.dispose();
+        backgroundTexture.dispose();
     }
-
 }

@@ -115,6 +115,16 @@ public class game_screen implements Screen {
             }
         });
     
+        pausebutton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                orginal_game_variable.pause_screen.dispose();
+                pause_screen new_Pause_screen = new pause_screen(orginal_game_variable, orginal_game_variable.assetManager);
+                orginal_game_variable.pause_screen = new_Pause_screen;
+                orginal_game_variable.setScreen(new_Pause_screen);
+            }
+        });
+
         // Positioning buttons
         // Back button at the top-left corner
         table.add(backbutton).size(100f, 100f).expand().top().left().pad(20f);

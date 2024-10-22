@@ -8,11 +8,13 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -26,13 +28,14 @@ public class SettingsScreen implements Screen {
     private SpriteBatch batch;
     private FitViewport viewport;
     private Texture s_background;
-
+    private MyGame game;
     private ArrayList<Birdparentclass> birdList;  // List of available birds
     private Birdparentclass selectedBird;         // Track the selected bird
 
     private Label selectedBirdLabel;
 
-    public SettingsScreen() {
+    public SettingsScreen(MyGame game) {
+        this.game = game;
         viewport = new FitViewport(1920, 1080);  // Set up a 1920x1080 viewport
         stage = new Stage(viewport);
         s_background = new Texture(Gdx.files.internal("setting_background.png"));  // Load background texture
@@ -41,6 +44,9 @@ public class SettingsScreen implements Screen {
         batch = new SpriteBatch();
         font = new BitmapFont(Gdx.files.internal("default.fnt"));
         font.setColor(Color.WHITE);
+        font.getData().setScale(3.0f);
+
+
 
         // Initialize bird list and default bird selection
         initializeBirdList();
@@ -71,29 +77,87 @@ public class SettingsScreen implements Screen {
     private void createSettingsButtons() {
         // Load button texture with rounded corners
         Texture buttonTexture = new Texture(Gdx.files.internal("button.png"));
-        NinePatch buttonPatch = new NinePatch(buttonTexture, 10, 10, 10, 10);
+        NinePatch buttonPatch = new NinePatch(buttonTexture, 5, 5, 5, 5);
         NinePatchDrawable buttonDrawable = new NinePatchDrawable(buttonPatch);
 
         // Create a TextButton style programmatically
         TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
         buttonStyle.up = buttonDrawable;
         buttonStyle.down = buttonDrawable;
-        buttonStyle.font = new BitmapFont();
+
+        // Increase the font size for the button text
+        BitmapFont buttonFont = new BitmapFont(Gdx.files.internal("default.fnt"));
+        buttonFont.getData().setScale(1.5f);  // Increase the font size by 3
+        buttonStyle.font = buttonFont;
 
         // Create buttons with the new style
-        TextButton soundButton = new TextButton("Sound: ON", buttonStyle);
-        TextButton graphicsButton = new TextButton("Graphics: HIGH", buttonStyle);
-        TextButton controlsButton = new TextButton("Controls: SIMPLE", buttonStyle);
-        TextButton backButton = new TextButton("Back", buttonStyle);
+        final TextButton soundButton = new TextButton("Sound: ON", buttonStyle);
+        final TextButton graphicsButton = new TextButton("Graphics: HIGH", buttonStyle);
+        final TextButton controlsButton = new TextButton("Controls: SIMPLE", buttonStyle);
+        final TextButton backButton = new TextButton("Back", buttonStyle);
 
-        // Add buttons to the table
-        table.add(soundButton).pad(15).width(250).height(200);
+        // Add listeners to each button
+
+        // Listener for soundButton (toggle between ON/OFF)
+        soundButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+
+                if (soundButton.getText().toString().equals("Sound: ON")) {
+                    soundButton.setText("Sound: OFF");
+                    game.bkgmusic.pause();
+                } else {
+                    soundButton.setText("Sound: ON");
+                    game.bkgmusic.play();
+                }
+            }
+        });
+
+        // Listener for graphicsButton (toggle between HIGH/MEDIUM/LOW)
+        graphicsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String currentText = graphicsButton.getText().toString();
+                if (currentText.equals("Graphics: HIGH")) {
+                    graphicsButton.setText("Graphics: MEDIUM");
+                } else if (currentText.equals("Graphics: MEDIUM")) {
+                    graphicsButton.setText("Graphics: LOW");
+                } else {
+                    graphicsButton.setText("Graphics: HIGH");
+                }
+            }
+        });
+
+        // Listener for controlsButton (toggle between SIMPLE/ADVANCED)
+        controlsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (controlsButton.getText().toString().equals("Controls: SIMPLE")) {
+                    controlsButton.setText("Controls: ADVANCED");
+                } else {
+                    controlsButton.setText("Controls: SIMPLE");
+                }
+            }
+        });
+
+        // Listener for backButton (go back to the previous screen or main menu)
+        backButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Code to navigate back to the previous screen
+                // For example:
+                // game.setScreen(new MainMenuScreen(game));
+            }
+        });
+
+        // Add buttons to the table with increased padding and size
+        table.add(soundButton).padTop(5).width(250).height(150);  // Increase button size
         table.row();
-        table.add(graphicsButton).pad(15).width(300).height(200);
+        table.add(graphicsButton).padTop(5).width(250).height(150);
         table.row();
-        table.add(controlsButton).pad(15).width(300).height(200);
+        table.add(controlsButton).padTop(5).width(250).height(150);
         table.row();
-        table.add(backButton).padTop(15).width(200).height(200);
+        table.add(backButton).padTop(5).width(200).height(100);
     }
 
 
@@ -107,12 +171,22 @@ public class SettingsScreen implements Screen {
     public void render(float delta) {
         // Clear the screen and draw the background
         batch.begin();
+
+        // Draw the background
         batch.draw(s_background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+
+        // Set the font size by scaling
+        font.getData().setScale(4.0f);
+        font.setColor(Color.MAGENTA); ;
+        font.draw(batch, "Settings",850 , 1000);  // Adjust x, y position based on scaling
+
         batch.end();
 
-        stage.act(delta);  // Update the stage
+        // Update and draw the stage
+        stage.act(delta);
         stage.draw();
     }
+
 
     @Override
     public void resize(int width, int height) {

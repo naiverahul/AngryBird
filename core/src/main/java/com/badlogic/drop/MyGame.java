@@ -1,8 +1,11 @@
 package com.badlogic.drop;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 
 public class MyGame extends Game {
     // protected FirstScreen firstScreen;
@@ -12,6 +15,7 @@ public class MyGame extends Game {
     protected SettingsScreen settingsScreen;
     protected game_screen game_screen;
     protected AssetManager assetManager;
+    protected Music bkgmusic;
 
     @Override
     public void create() {
@@ -21,9 +25,13 @@ public class MyGame extends Game {
         loadingScreen = new LoadingScreen(this, assetManager);
         // firstScreen = new FirstScreen(this);
         level_screen = new level_screen(this);
-        settingsScreen = new SettingsScreen();
+        settingsScreen = new SettingsScreen(this);
         game_screen = new game_screen(this);
         pause_screen = level_screen;
+        bkgmusic = Gdx.audio.newMusic(Gdx.files.internal("angry_birds.mp3"));
+        bkgmusic.setLooping(true);
+        bkgmusic.setVolume(0.2f);
+        bkgmusic.play();
         // setScreen(loadingScreen);
         // setScreen(level_screen);
         switch_screen(loadingScreen);

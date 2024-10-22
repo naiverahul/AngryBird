@@ -9,6 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -32,6 +35,10 @@ public class LoadingScreen implements Screen {
     private OrthographicCamera camera;
     private static final float VIRTUAL_HEIGHT = 600;
 
+    private TextField nameField;
+    private Label namelabel;
+
+
     public LoadingScreen(MyGame game, AssetManager assetManager) {
         this.game = game;
         this.assetManager = assetManager;
@@ -47,7 +54,11 @@ public class LoadingScreen implements Screen {
 
         // Initialize the stage
         stage = new Stage();
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
 
+        // Name label and TextField for name input
+        namelabel = new Label("Enter Your Name:", skin);
+        nameField = new TextField("", skin);  // Empty text field for input
         // Add buttons to the stage
         stage.addActor(startButton);
         stage.addActor(exitButton);

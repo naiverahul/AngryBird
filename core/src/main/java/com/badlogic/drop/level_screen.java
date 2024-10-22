@@ -215,7 +215,7 @@ public class level_screen implements Screen {
     private ImageButton l_back_button, l_1_button, l_2_button, l_3_button, l_4_button, l_settings_button;
     private game_screen l_game_screen;
 
-    public level_screen(MyGame game, AssetManager assetManager) {
+    public level_screen(MyGame game) {
         this.game = game;
         this.assetManager = assetManager;
         this.stage = new Stage(new FitViewport(1920, 1080));

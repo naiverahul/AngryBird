@@ -20,7 +20,7 @@ public class MyGame extends Game {
         // Create instances of your screens
         loadingScreen = new LoadingScreen(this, assetManager);
         // firstScreen = new FirstScreen(this);
-        level_screen = new level_screen(this, assetManager);
+        level_screen = new level_screen(this);
         settingsScreen = new SettingsScreen();
         game_screen = new game_screen(this);
         pause_screen = level_screen;

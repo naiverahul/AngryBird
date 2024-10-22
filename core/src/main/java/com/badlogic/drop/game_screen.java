@@ -26,6 +26,7 @@ public class game_screen implements Screen {
     private Texture game_background;
     private Queue<Birdparentclass> birdQueue;
     private Birdparentclass currentBird;
+    
 
     public game_screen(MyGame game) {
         this.orginal_game_variable = game;

@@ -257,17 +257,6 @@ public class level_screen implements Screen {
             }
         });
 
-        // l_1_button.addListener(new ClickListener() {
-        //     @Override
-        //     public void clicked(InputEvent event, float x, float y) {
-        //         game.switch_screen(l_game_screen);
-        //     }
-        // });
-        l_level_button_listener(l_1_button);
-        l_level_button_listener(l_2_button);
-        l_level_button_listener(l_3_button);
-        l_level_button_listener(l_4_button);
-
         l_settings_button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -278,6 +267,11 @@ public class level_screen implements Screen {
             }
         });
         
+        l_level_button_listener(l_1_button);
+        l_level_button_listener(l_2_button);
+        l_level_button_listener(l_3_button);
+        l_level_button_listener(l_4_button);
+
         
 
 

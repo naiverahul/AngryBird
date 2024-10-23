@@ -156,7 +156,7 @@ public class SettingsScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 game.clicksound.play();
 
-                game.settingsScreen.dispose();
+                game.level_screen.dispose();
                 level_screen new_level_screen = new level_screen(game);
                 game.level_screen = new_level_screen;
                 game.setScreen(game.level_screen);

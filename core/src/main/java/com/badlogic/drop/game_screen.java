@@ -1,164 +1,113 @@
-
 package com.badlogic.drop;
 
-import Birds.Birdparentclass;
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import java.util.LinkedList;
-import java.util.Queue;
+
+import Birds.Birdparentclass;
 
 public class game_screen implements Screen {
-    private final MyGame orginal_game_variable;
-    private Stage stage;
-    private FitViewport viewport;
-    private Texture game_background;
-    private Queue<Birdparentclass> birdQueue;
-    private Birdparentclass currentBird;
-    private ImageButton catapultButton;
-    private ImageButton pausebutton;
-    private ImageButton backbutton;
+    private final MyGame g_original_game_variable;
+    private Stage g_stage;
+    private FitViewport g_viewport;
+    private Texture g_background;
+    private ArrayList<Birdparentclass> g_bird_list;
+    private Birdparentclass g_bird_on_catapult;
+    private ImageButton g_catapult, g_pause_button, g_back_button;
+    private int current_bird_index = 0;
 
     public game_screen(MyGame game) {
-        this.orginal_game_variable = game;
-        this.viewport = new FitViewport(1920, 1080);
-        this.stage = new Stage(viewport);
-        this.game_background = new Texture(Gdx.files.internal("game_screen.png"));
-        this.birdQueue = new LinkedList<>();
+        this.g_original_game_variable = game;
+        this.g_viewport = new FitViewport(1920, 1080);
+        this.g_stage = new Stage(g_viewport);
+        this.g_background = new Texture("game_screen.png");
+        this.g_bird_list = new ArrayList<>();
 
-        initBirds();
-        setupUI();
+        g_initialize_birds();
+        g_create_UI();
 
         // Start with the first bird in the queue
-        this.currentBird = birdQueue.peek();
+        this.g_bird_on_catapult = g_bird_list.get(current_bird_index);
     }
 
-
-
-    private void initBirds() {
-        birdQueue.add(new Birdparentclass("bigbird","Birdimages/bigbird.png", 10, 5));
-        birdQueue.add(new Birdparentclass("redbird","Birdimages/redbird.png", 8, 6));
-        birdQueue.add(new Birdparentclass("yellowbird","Birdimages/yellowbird.png", 12, 7));
-        birdQueue.add(new Birdparentclass("blackbird","Birdimages/blackbird.png", 15, 8));
+    private void g_initialize_birds() {
+        g_bird_list.add(new Birdparentclass("bigbird", "Birdimages/bigbird.png", 10, 5));
+        g_bird_list.add(new Birdparentclass("redbird", "Birdimages/redbird.png", 8, 6));
+        g_bird_list.add(new Birdparentclass("yellowbird", "Birdimages/yellowbird.png", 12, 7));
+        g_bird_list.add(new Birdparentclass("blackbird", "Birdimages/blackbird.png", 15, 8));
     }
 
-    // private void setupUI() {
-    //     Table table = new Table();
-    //     table.debug(Table.Debug.all);
-    //     table.setFillParent(true);
-    //     stage.addActor(table);
-
-    //     this.catapultButton = createButton("catapult.png");
-    //     this.pausebutton = createButton("pause.png");
-    //     this.backbutton = createButton("back.png");
-    //     catapultButton.addListener(new ClickListener() {
-    //         @Override
-    //         public void clicked(InputEvent event, float x, float y) {
-    //             launchBird();
-    //         }
-    //     });
-    //     backbutton.addListener(new ClickListener() {
-    //         @Override
-    //         public void clicked(InputEvent event, float x, float y) {
-    //             orginal_game_variable.level_screen.dispose();
-    //             level_screen new_Level_screen = new level_screen(orginal_game_variable);
-    //             orginal_game_variable.level_screen = new_Level_screen;
-    //             orginal_game_variable.setScreen(new_Level_screen);
-    //         }
-    //     });
-
-
-    //     table.add(catapultButton).size(200f, 200f).expand().bottom().pad(100f).left().pad(100f);
-    //     table.padBottom(50f);
-    //     table.add(backbutton).size(200f, 200f).expand().top().pad(25f).left().pad(25f);
-    //     table.row();
-    //     table.add(pausebutton).size(200f, 200f).expand().top().pad(25f).right().pad(25f);
-    // }
-
-
-    private void setupUI() {
+    private void g_create_UI() {
         Table table = new Table();
         table.debug(Table.Debug.all);
         table.setFillParent(true);
-        stage.addActor(table);
+        g_stage.addActor(table);
 
-        this.catapultButton = createButton("catapult.png");
-        this.pausebutton = createButton("pause.png");
-        this.backbutton = createButton("back.png");
+        this.g_catapult = g_create_button("catapult.png");
+        this.g_pause_button = g_create_button("pause.png");
+        this.g_back_button = g_create_button("back.png");
 
-        pausebutton.addListener(new ClickListener() {
+        g_catapult.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                orginal_game_variable.pause_screen.dispose();
-                pause_screen new_Pause_screen = new pause_screen(orginal_game_variable);
-                orginal_game_variable.pause_screen = new_Pause_screen;
-                orginal_game_variable.setScreen(new_Pause_screen);
+                g_change_catapult_bird();
+            }
+        });
+        g_pause_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                g_original_game_variable.pause_screen.dispose();
+                g_original_game_variable.pause_screen = new pause_screen(g_original_game_variable);
+                g_original_game_variable.setScreen(g_original_game_variable.pause_screen);
+            }
+        });
+        g_back_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                g_original_game_variable.level_screen.dispose();
+                g_original_game_variable.level_screen = new level_screen(g_original_game_variable);
+                g_original_game_variable.setScreen(g_original_game_variable.level_screen);
             }
         });
 
-        catapultButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                launchBird();
-            }
-        });
-
-        backbutton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-
-                orginal_game_variable.level_screen.dispose();
-                level_screen new_Level_screen = new level_screen(orginal_game_variable);
-                orginal_game_variable.level_screen = new_Level_screen;
-                orginal_game_variable.setScreen(new_Level_screen);
-            }
-        });
-
-        // Positioning buttons
-        // Back button at the top-left corner
-        table.add(backbutton).size(100f, 100f).expand().top().left().pad(20f);
-
-        // Pause button at the top-right corner
-        table.add(pausebutton).size(100f, 100f).top().right().pad(20f);
-
+        table.add(g_back_button).size(150f, 150f).expand().top().left().pad(20f);
+        table.add(g_pause_button).size(100f, 100f).top().right().pad(20f);
         table.row();
+        table.add(g_catapult).size(200f, 200f).expand().bottom().left().pad(100f);
 
-        // Catapult button at the bottom-left corner
-        table.add(catapultButton).size(200f, 200f).bottom().left().pad(100f);
     }
 
-
-
-
-    private ImageButton createButton(String texturePath) {
-        Texture texture = new Texture(Gdx.files.internal(texturePath));
-        return new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
+    private ImageButton g_create_button(String image_path) {
+        return new ImageButton(new TextureRegionDrawable(new Texture(Gdx.files.internal(image_path))));
     }
 
-    private void launchBird() {
-        if (!birdQueue.isEmpty()) {
-            Birdparentclass bird = birdQueue.poll();
-            Gdx.app.log("Launching Bird", "Launched " + bird.getName() + " with strength " + bird.getAttackingPower());
-            birdQueue.add(bird); // Adds the bird back to the queue after launch
-            currentBird = birdQueue.peek(); // Set the next bird to be launched
+    private void g_change_catapult_bird() {
+        current_bird_index = (current_bird_index + 1) % (g_bird_list.size());
+        g_bird_on_catapult = g_bird_list.get(current_bird_index);
+    }
+
+    private void g_add_birds_to_table() {
+        for (Birdparentclass bird : g_bird_list) {
+            if (!(bird.equals(g_bird_on_catapult))) {
+                // ImageButton g_bird_button = g_create_button();
+            }
         }
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(stage);
+        Gdx.input.setInputProcessor(g_stage);
     }
 
     @Override
@@ -166,47 +115,28 @@ public class game_screen implements Screen {
         ScreenUtils.clear(Color.SKY);
 
         // Begin drawing
-        stage.getBatch().begin();
-        stage.getBatch().draw(game_background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        g_stage.getBatch().begin();
+        g_stage.getBatch().draw(g_background, 0, 0, g_viewport.getWorldWidth(), g_viewport.getWorldHeight());
 
         // Draw the current bird scaled down on the catapult
-        if (currentBird != null) {
-            float birdWidth = currentBird.getTexture().getWidth() * 0.25f;
-            float birdHeight = currentBird.getTexture().getHeight() * 0.25f;
-            stage.getBatch().draw(currentBird.getTexture(), catapultButton.getX()+50f, catapultButton.getY()+150f, birdWidth, birdHeight);
-            // if ((birdQueue.size() > 1)) {
-            //     Birdparentclass last_bird = birdQueue.;
-            //     // Draw the next bird in the queue
-            //     Birdparentclass nextBird = birdQueue.peek();
-            //     float nextbirdWidth = nextBird.getTexture().getWidth() * 0.1f;
-            //     float nextbirdHeight = nextBird.getTexture().getHeight() * 0.1f;
-            //     stage.getBatch().draw(nextBird.getTexture(), catapultButton.getX() + 50f, catapultButton.getY() + 150f, birdWidth, birdHeight);
-                
-            // }
+        if (g_bird_on_catapult != null) {
+            float birdWidth = g_bird_on_catapult.getTexture().getWidth() * 0.25f;
+            float birdHeight = g_bird_on_catapult.getTexture().getHeight() * 0.25f;
+            g_stage.getBatch().draw(g_bird_on_catapult.getTexture(), g_catapult.getX() + 50f, g_catapult.getY() + 150f,
+                    birdWidth, birdHeight);
+
         }
 
-
-
-        stage.getBatch().end();
+        g_stage.getBatch().end();
 
         // Stage needs to act and draw UI elements
-        stage.act(delta);
-        stage.draw();
+        g_stage.act(delta);
+        g_stage.draw();
     }
-
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
-        game_background.dispose();
-        for (Birdparentclass bird : birdQueue) {
-            bird.dispose();
-        }
+        g_viewport.update(width, height, true);
     }
 
     @Override
@@ -223,8 +153,17 @@ public class game_screen implements Screen {
 
     @Override
     public void hide() {
-        // // TODO Auto-generated method stub
+        // TODO Auto-generated method stub
         // throw new UnsupportedOperationException("Unimplemented method 'hide'");
+    }
+
+    @Override
+    public void dispose() {
+        g_stage.dispose();
+        g_background.dispose();
+        for (Birdparentclass bird : g_bird_list) {
+            bird.dispose();
+        }
 
     }
 }

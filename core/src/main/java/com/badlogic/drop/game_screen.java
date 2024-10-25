@@ -171,9 +171,18 @@ public class game_screen implements Screen {
 
         // Draw the current bird scaled down on the catapult
         if (currentBird != null) {
-            float birdWidth = currentBird.getTexture().getWidth() * 0.25f;  
-            float birdHeight = currentBird.getTexture().getHeight() * 0.25f; 
+            float birdWidth = currentBird.getTexture().getWidth() * 0.25f;
+            float birdHeight = currentBird.getTexture().getHeight() * 0.25f;
             stage.getBatch().draw(currentBird.getTexture(), catapultButton.getX()+50f, catapultButton.getY()+150f, birdWidth, birdHeight);
+            // if ((birdQueue.size() > 1)) {
+            //     Birdparentclass last_bird = birdQueue.;
+            //     // Draw the next bird in the queue
+            //     Birdparentclass nextBird = birdQueue.peek();
+            //     float nextbirdWidth = nextBird.getTexture().getWidth() * 0.1f;
+            //     float nextbirdHeight = nextBird.getTexture().getHeight() * 0.1f;
+            //     stage.getBatch().draw(nextBird.getTexture(), catapultButton.getX() + 50f, catapultButton.getY() + 150f, birdWidth, birdHeight);
+                
+            // }
         }
 
 
@@ -203,13 +212,13 @@ public class game_screen implements Screen {
     @Override
     public void pause() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'pause'");
+        // throw new UnsupportedOperationException("Unimplemented method 'pause'");
     }
 
     @Override
     public void resume() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'resume'");
+        // throw new UnsupportedOperationException("Unimplemented method 'resume'");
     }
 
     @Override

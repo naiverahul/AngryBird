@@ -105,7 +105,8 @@ public class game_screen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 g_original_game_variable.clicksound.play();
                 g_original_game_variable.win_screen.dispose();
-                g_original_game_variable.win_screen = new WinScreen(g_original_game_variable);
+                // g_original_game_variable.win_screen = new WinScreen(g_original_game_variable);
+                g_original_game_variable.win_screen = new win_screen(g_original_game_variable);
                 g_original_game_variable.setScreen(g_original_game_variable.win_screen);
             }
         });
@@ -114,7 +115,8 @@ public class game_screen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 g_original_game_variable.clicksound.play();
                 g_original_game_variable.lose_screen.dispose();
-                g_original_game_variable.lose_screen = new LoseScreen(g_original_game_variable);
+                g_original_game_variable.lose_screen = new lose_screen(g_original_game_variable);
+                // g_original_game_variable.lose_screen = new LoseScreen(g_original_game_variable);
                 g_original_game_variable.setScreen(g_original_game_variable.lose_screen);
             }
         });

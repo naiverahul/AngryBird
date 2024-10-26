@@ -42,8 +42,8 @@ public class game_screen implements Screen {
         this.g_background = new Texture("game_screen.png");
         this.g_bird_list = new ArrayList<>();
 
-        this.g_level_generator = new LevelGenerator();
-        this.g_level_generator.generateRandomLevel();
+        this.g_level_generator = new LevelGenerator(g_stage);
+        this.g_level_generator.generateLevel();
 
         g_initialize_birds();
         g_create_UI();

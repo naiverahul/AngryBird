@@ -9,7 +9,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -26,6 +28,10 @@ public class game_screen implements Screen {
     private Birdparentclass g_bird_on_catapult;
     private ImageButton g_catapult, g_pause_button, g_back_button;
     private int current_bird_index = 0;
+
+    private TextButton g_win_button;
+    private TextButton g_lose_button;
+    private Skin g_skin;
 
     public game_screen(MyGame game) {
         this.g_original_game_variable = game;
@@ -82,9 +88,40 @@ public class game_screen implements Screen {
         });
 
         table.add(g_back_button).size(150f, 150f).expand().top().left().pad(20f);
+        add_win_lose_screens(table);
         table.add(g_pause_button).size(100f, 100f).top().right().pad(20f);
         table.row();
         table.add(g_catapult).size(200f, 200f).expand().bottom().left().pad(100f);
+
+    }
+    private void add_win_lose_screens(Table table) {
+        g_skin = new Skin(Gdx.files.internal("uiskin.json"));
+        
+        g_win_button = new TextButton("You Win!", g_skin);
+        g_lose_button = new TextButton("You Lose!", g_skin);
+
+        g_win_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                g_original_game_variable.clicksound.play();
+                g_original_game_variable.win_screen.dispose();
+                g_original_game_variable.win_screen = new WinScreen(g_original_game_variable);
+                g_original_game_variable.setScreen(g_original_game_variable.win_screen);
+            }
+        });
+        g_lose_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                g_original_game_variable.clicksound.play();
+                g_original_game_variable.lose_screen.dispose();
+                g_original_game_variable.lose_screen = new LoseScreen(g_original_game_variable);
+                g_original_game_variable.setScreen(g_original_game_variable.lose_screen);
+            }
+        });
+        
+        
+        table.add(g_win_button).size(150f, 50f).top().right().padTop(10f).padRight(10f);
+        table.add(g_lose_button).size(150f, 50f).top().right().padTop(10f).padRight(10f);
 
     }
 

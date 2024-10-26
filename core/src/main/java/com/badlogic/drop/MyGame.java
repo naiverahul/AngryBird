@@ -15,6 +15,8 @@ public class MyGame extends Game {
     protected pause_screen pause_screen;
     protected SettingsScreen settingsScreen;
     protected game_screen game_screen;
+    protected WinScreen win_screen;
+    protected LoseScreen lose_screen;
     protected AssetManager assetManager;
     protected Music bkgmusic;
     protected Sound clicksound;
@@ -38,6 +40,8 @@ public class MyGame extends Game {
         // setScreen(loadingScreen);
         // setScreen(level_screen);
         clicksound = Gdx.audio.newSound(Gdx.files.internal("clicksound.mp3"));
+        win_screen = new WinScreen(this);
+        lose_screen = new LoseScreen(this);
         switch_screen(loadingScreen);
     }
 

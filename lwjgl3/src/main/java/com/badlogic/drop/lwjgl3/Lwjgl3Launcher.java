@@ -26,7 +26,7 @@ public class Lwjgl3Launcher {
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
         //// If you remove the above line and set Vsync to false, you can get unlimited FPS, which can be
         //// You may also need to configure GPU drivers to fully disable Vsync; this can cause screen tearing.
-        configuration.setWindowedMode(640, 480);
+        configuration.setWindowedMode(1920, 1080);
         return configuration;
     }
 }

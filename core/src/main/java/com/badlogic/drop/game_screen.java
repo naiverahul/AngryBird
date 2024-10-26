@@ -33,12 +33,17 @@ public class game_screen implements Screen {
     private TextButton g_lose_button;
     private Skin g_skin;
 
+    private LevelGenerator g_level_generator;
+
     public game_screen(MyGame game) {
         this.g_original_game_variable = game;
         this.g_viewport = new FitViewport(1920, 1080);
         this.g_stage = new Stage(g_viewport);
         this.g_background = new Texture("game_screen.png");
         this.g_bird_list = new ArrayList<>();
+
+        this.g_level_generator = new LevelGenerator();
+        this.g_level_generator.generateRandomLevel();
 
         g_initialize_birds();
         g_create_UI();

@@ -1,6 +1,9 @@
 package com.badlogic.drop;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
 import Defense.DefenseStructure;
@@ -28,51 +31,51 @@ public class LevelGenerator {
         this.random = new Random();
     }
 
-    public void generateLevel() {
+    public void generateLevel(BodyDef bodyDef, FixtureDef  fixtureDef, World world) {
         // Clear the current level
         stage.clear();
 
-        generateDefenseStructures(5); // Generate 5 defense structures
+        generateDefenseStructures(bodyDef,fixtureDef,world,5); // Generate 5 defense structures
     }
 
-    private void generateDefenseStructures(int structureCount) {
+    private void generateDefenseStructures(BodyDef bodyDef, FixtureDef  fixtureDef, World world, int structureCount) {
         for (int i = 0; i < structureCount; i++) {
             // Define the base X position for this structure
             int baseX = MIN_X + random.nextInt(MAX_X - MIN_X);
-            
+
             // Define how many blocks high the structure will be
             int structureHeight = 3 + random.nextInt(3); // Towers of 3 to 5 blocks
-    
+
             // Alternate types of blocks in the structure
             String[] blockTypes = {"wood", "stone", "glass"};
-            
+
             for (int j = 0; j < structureHeight; j++) {
                 // Set the Y position based on the height of the structure
                 int blockHeight = BLOCK_SIZE;
                 int blockY = MIN_Y + j * blockHeight;
-    
+
                 // Randomly select block type for the current level of the structure
                 String type = blockTypes[j % blockTypes.length];  // Cycle through wood, stone, and glass
                 String texturePath = getTextureForType(type);
                 Vector2 position = new Vector2(baseX, blockY);
-    
+
                 // Create a block and set its size
-                DefenseStructure structure = new DefenseStructure(type, texturePath, getRandomStrength(type), position);
+                DefenseStructure structure = new DefenseStructure(bodyDef, fixtureDef ,world,type, texturePath, getRandomStrength(type), position);
                 structure.setSize(BLOCK_SIZE, BLOCK_SIZE);  // Set a reasonable size for each block
                 stage.addActor(structure);
             }
-            
-        
+
+
             int pigY = MIN_Y + structureHeight * BLOCK_SIZE;
             Pig pig = new Pig("Pig" + i, "pig.png", 100);
             pig.setPosition(baseX, pigY);
             pig.setSize(50, 50);  // Set a reasonable size for the pig
             stage.addActor(pig);
-            
+
         }
     }
-    
-    
+
+
 
 
     private String getTextureForType(String type) {

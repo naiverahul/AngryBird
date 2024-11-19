@@ -22,6 +22,7 @@ public class MyGame extends Game {
     protected AssetManager assetManager;
     protected Music bkgmusic;
     protected Sound clicksound;
+    protected Play play;
 
     @Override
     public void create() {
@@ -35,6 +36,7 @@ public class MyGame extends Game {
         game_screen = new game_screen(this);
         // pause_screen = level_screen;
         pause_screen = new pause_screen(this);
+        play = new Play(this);
         bkgmusic = Gdx.audio.newMusic(Gdx.files.internal("angry_birds.mp3"));
         bkgmusic.setLooping(true);
         bkgmusic.setVolume(0.2f);
@@ -46,7 +48,7 @@ public class MyGame extends Game {
         win_screen = new win_screen(this);
         // lose_screen = new LoseScreen(this);
         lose_screen = new lose_screen(this);
-        switch_screen(loadingScreen);
+        switch_screen(game_screen);
     }
 
     public void switch_screen(Screen target_screen) {
@@ -67,5 +69,10 @@ public class MyGame extends Game {
         if (level_screen != null) level_screen.dispose();
         if(settingsScreen != null) settingsScreen.dispose();
         assetManager.dispose();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
     }
 }

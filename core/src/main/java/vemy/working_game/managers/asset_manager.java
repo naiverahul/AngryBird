@@ -100,7 +100,11 @@ public class asset_manager {
     public <T> T get(String assetName, Class<T> type) {
         return assetManager.get(assetName, type);
     }
- 
+
+    public float get_progress() {
+        return assetManager.getProgress();
+    }
+
     public void dispose() {
         assetManager.dispose();
         asset_manager.instance = null;

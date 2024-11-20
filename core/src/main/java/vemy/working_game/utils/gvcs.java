@@ -89,8 +89,8 @@ public class gvcs { // game_value_constants
     public static Sound win_sound = constant_asset_manager.get(win_sound_path, Sound.class);
 
     // world properties
-    public static final int starting_world_width = 800;
-    public static final int starting_world_height = 480;
+    public static final int starting_world_width = 1920;
+    public static final int starting_world_height = 1080;
     public static int World_Width = starting_world_width;
     public static int World_Height = starting_world_height;
 

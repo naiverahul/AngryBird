@@ -1,16 +1,24 @@
 package vemy.working_game.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -66,7 +74,7 @@ public class game_open_screen extends ScreenAdapter {
 
         this.gol_viewport = new FitViewport(gol_virtual_width, gol_virtual_height, gol_camera);
 
-        // setting the viewport of the stage
+        // setting the viewport of the gol_stage
         {
             this.gol_stage.setViewport(gol_viewport);
             // this.gol_viewport.apply();
@@ -79,8 +87,19 @@ public class game_open_screen extends ScreenAdapter {
         {
             this.gol_play_button_texture = gol_asset_manager.get(gvcs.start_button_path, Texture.class);
             this.gol_exit_button_texture = gol_asset_manager.get(gvcs.exit_button_path, Texture.class);
-            this.gol_login_button_texture = gol_asset_manager.get(gvcs.login_button_path, Texture.class);
-            this.gol_signup_button_texture = gol_asset_manager.get(gvcs.signup_button_path, Texture.class);
+            // this.gol_login_button_texture = gol_asset_manager.get(gvcs.login_button_path,
+            // Texture.class);
+            // this.gol_signup_button_texture =
+            // gol_asset_manager.get(gvcs.signup_button_path, Texture.class);
+
+        }
+
+        // creating the buttons
+        {
+            this.gol_play_button = new ImageButton(new TextureRegionDrawable(gol_play_button_texture));
+            this.gol_exit_button = new ImageButton(new TextureRegionDrawable(gol_exit_button_texture));
+            // this.gol_login_button = new ImageButton(gol_login_button_texture);
+            // this.gol_signup_button = new ImageButton(gol_signup_button_texture);
         }
 
         create_ui();
@@ -98,13 +117,145 @@ public class game_open_screen extends ScreenAdapter {
             gol_username_field.setVisible(gol_name_dialog_visibile);
         }
 
-        setup_progress_bar();
+        // loading progress bar setup
+        {
+            gol_skin = new Skin();
+            Pixmap gol_pixmap = new Pixmap(20, 20, Pixmap.Format.RGBA8888);
+            gol_pixmap.setColor(Color.WHITE);
+            gol_pixmap.fill();
+            gol_skin.add("white", new Texture(gol_pixmap));
+            ProgressBar.ProgressBarStyle gol_progress_bar_style = new ProgressBar.ProgressBarStyle(
+                    gol_skin.newDrawable("white", Color.DARK_GRAY),
+                    gol_skin.newDrawable("white", Color.BLUE));
+            gol_progress_bar_style.knobBefore = gol_progress_bar_style.knob;
+            gol_progress_bar = new ProgressBar(0, 1, 0.01f, false, gol_progress_bar_style);
+            gol_progress_bar.setSize(800f, 100f);
+            gol_progress_bar.setPosition(
+                    (gol_viewport.getWorldWidth() - gol_progress_bar.getWidth()) / 2f + 400f,
+                    150f);
+            gol_progress_bar.setValue(0f);
+            gol_progress_bar.setAnimateDuration(1.3f);
+            gol_stage.addActor(gol_progress_bar);
+            gol_pixmap.dispose();
+        }
 
+        // setting the position and size of the buttons
+        {
+            gol_play_button.setSize(250f, 140f);
+            gol_play_button.setPosition(835f, gol_viewport.getWorldHeight() / 18f);
+            gol_exit_button.setSize(250f, 140f);
+            gol_exit_button.setPosition(0, 0);
+            gol_username_label.setPosition(760f, 600f);
+            gol_username_label.setFontScale(3.0f);
+            gol_username_field.setPosition(760f, 400f);
+            gol_username_field.setSize(400f, 80f);
+            gol_username_field.setCursorPosition((int) gol_username_field.getWidth() / 2);
+            gol_username_field.setColor(Color.NAVY);
+            gol_stage.addActor(gol_username_label);
+            gol_stage.addActor(gol_username_field);
+            gol_stage.addActor(gol_play_button);
+            gol_stage.addActor(gol_exit_button);
+        }
 
+        // adding listeners to the buttons
+        {
+            gol_play_button.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (!gol_name_dialog_visibile) {
+                        gol_username_label.setVisible(true);
+                        gol_username_field.setVisible(true);
+                        gol_name_dialog_visibile = true;
+                    } else {
+                        game.setScreen(game.get_level_select_screen());
+                    }
+                }
+            });
+
+            gol_exit_button.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    gvcs.click_sound.play();
+                    Gdx.app.exit();
+                }
+            });
+            Gdx.input.setInputProcessor(new InputAdapter() {
+                @Override
+                public boolean keyDown(int keycode) {
+                    if (keycode == Input.Keys.ENTER) {
+                        if (!gol_name_dialog_visibile) {
+                            gol_username_label.setVisible(true);
+                            gol_username_field.setVisible(true);
+                            gol_name_dialog_visibile = true;
+                        } else {
+                            game.setScreen(game.get_level_select_screen());
+                        }
+                        return true;
+                    } else if (keycode == Input.Keys.ESCAPE) {
+                        gvcs.click_sound.play();
+                        Gdx.app.exit();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
 
     }
 
-    private void setup_progress_bar(){
-        
+    
+    @Override
+    public void render(float delta) {
+        ScreenUtils.clear(1, 1f, 1.5f, 1);
+        gol_batch.setProjectionMatrix(gol_camera.combined);
+        gol_batch.begin();
+        float imageWidth = 1440f;
+        float imageHeight = 765f;
+        float x = (gol_viewport.getWorldWidth() - imageWidth) / 2f;
+        float y = (gol_viewport.getWorldHeight() - imageHeight) / 2f;
+        gol_batch.draw(gol_background, x, y, imageWidth, imageHeight);
+        gol_batch.end();
+        float progress = gol_asset_manager.get_progress();
+        gol_progress_bar.setValue(progress);
+
+        if (progress >= 1.0f && !gol_loading_complete) {
+            gol_loading_complete = true;
+            gol_show_button_task = new Timer.Task() {
+                @Override
+                public void run() {
+                    gol_progress_bar.setVisible(false);
+                    gol_play_button.setVisible(true);
+                    gol_exit_button.setVisible(true);
+                    gol_button_visible = true;
+                }
+            };
+            Timer.schedule(gol_show_button_task, 1.0f);
+        }
+
+        if (!gol_button_visible) {
+            gol_play_button.setVisible(false);
+            gol_exit_button.setVisible(false);
+        }
+
+        gol_stage.act(delta);
+        gol_stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        gol_viewport.update(width, height, true);
+        gol_stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        gol_batch.dispose();
+        gol_background.dispose();
+        gol_stage.dispose();
+        ((TextureRegionDrawable) gol_play_button.getStyle().imageUp).getRegion().getTexture().dispose();
+        ((TextureRegionDrawable) gol_exit_button.getStyle().imageUp).getRegion().getTexture().dispose();
+        if (gol_show_button_task != null) {
+            gol_show_button_task.cancel();
+        }
     }
 }

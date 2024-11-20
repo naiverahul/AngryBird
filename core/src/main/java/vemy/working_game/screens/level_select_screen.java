@@ -1,5 +1,7 @@
 package vemy.working_game.screens;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
@@ -34,6 +36,7 @@ public class level_select_screen extends ScreenAdapter{
     private Table ls_table;
     private ImageButton ls_back_button, ls_settings_button;
     private ImageButton[] level_buttons;
+    // private ArrayList<ImageButton> level_buttons;
     private int button_number;
     
     public level_select_screen(my_game game) {
@@ -41,12 +44,13 @@ public class level_select_screen extends ScreenAdapter{
         ls_viewport = new FitViewport(gvcs.World_Width, gvcs.World_Height);
         ls_stage = new Stage(ls_viewport);
         ls_background = game.get_asset_manager().get(gvcs.level_select_screen_path, Texture.class);
+        level_buttons = new ImageButton[gvcs.max_levels];
+        // level_buttons = new ArrayList<ImageButton>(gvcs.max_levels);
 
         create_ui();
     }
 
     private void create_ui(){
-
         ls_table = new Table();
         ls_table.setFillParent(true);
         ls_stage.addActor(ls_table);

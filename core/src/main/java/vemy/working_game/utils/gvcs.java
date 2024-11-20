@@ -25,8 +25,8 @@ public class gvcs { // game_value_constants
     public static final String game_music_path = "sounds/system/angry_birds_music.mp3";
     // public static final String game_music_path = "angry_birds_music.mp3";
     public static final String click_sound_path = "sounds/system/click_sound.mp3";
-    public static final String lose_sound_path = "sounds/lose_sound.mp3";
-    public static final String win_sound_path = "sounds/win_sound.mp3";
+    public static final String lose_sound_path = "sounds/result/lose_sound.wav";
+    public static final String win_sound_path = "sounds/result/win_sound.wav";
 
     public static final String game_screen_path = "images/backgrounds/game_screen.png";
     public static final String level_select_screen_path = "images/backgrounds/level_select_screen.png";
@@ -36,10 +36,10 @@ public class gvcs { // game_value_constants
 
     public static final String sling_shot_path = "images/sling_shot/sling_shot.png";
 
-    public static final String big_bird_path = "images/birds/big_birds.png";
-    public static final String black_bird_path = "images/birds/black_birds.png";
-    public static final String red_bird_path = "images/birds/red_birds.png";
-    public static final String yellow_bird_path = "images/birds/yellow_birds.png";
+    public static final String big_bird_path = "images/birds/big_bird.png";
+    public static final String black_bird_path = "images/birds/black_bird.png";
+    public static final String red_bird_path = "images/birds/red_bird.png";
+    public static final String yellow_bird_path = "images/birds/yellow_bird.png";
 
     public static final String cook_pig_path = "images/pigs/cook_pig.png";
     public static final String normal_pig_path = "images/pigs/normal_pig.png";
@@ -63,8 +63,8 @@ public class gvcs { // game_value_constants
 
     public static final String level_buttons = "images/level_number/";
 
-    public static final String glass_rectangle_path = "images/obstacles/Glase/glass_rectangle.png";
-    public static final String glass_traingle_path = "images/obstacles/Glase/glass_triangle.png";
+    public static final String glass_rectangle_path = "images/obstacles/Glass/glass_rectangle.png";
+    public static final String glass_traingle_path = "images/obstacles/Glass/glass_triangle.png";
 
     public static final String stone_circle_path = "images/obstacles/Stone/stone_circle.png";
     public static final String stone_triangle_path = "images/obstacles/Stone/stone_triangle.png";
@@ -73,7 +73,10 @@ public class gvcs { // game_value_constants
     public static final String wood_traingle_path = "images/obstacles/Wood/wood_triangle.png";
     public static final String wood_square_path = "images/obstacles/Wood/wood_square.png";
 
-    public static final String default_font_path = "default.fnt";
+    // public static final String default_font_path = "default.fnt";
+    public static final String default_font_path = "ui/font.fnt";
+
+    public static final String default_skin_path = "ui/uiskin.json";
 
     // internal working properties
     public static Music background_music = constant_asset_manager.get(game_music_path, Music.class);

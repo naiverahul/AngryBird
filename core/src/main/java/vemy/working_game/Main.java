@@ -15,10 +15,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import vemy.working_game.managers.asset_manager;
 
 public class Main extends Game {
-    
+
     private my_game myGame;
+    // private asset_manager asger = asset_manager.get_instance();
+    // {
+    //     asger.load_assets();
+    //     asger.finish_loading();
+    // }
 
     @Override
     public void create() {
@@ -40,5 +46,5 @@ public class Main extends Game {
         // Dispose of resources in MyGame
         myGame.dispose();
     }
-    
+
 }

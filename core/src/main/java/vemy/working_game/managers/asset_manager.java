@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 import vemy.working_game.utils.gvcs;
 
@@ -85,6 +86,11 @@ public class asset_manager {
 
         // Load font
         assetManager.load(gvcs.default_font_path, BitmapFont.class);
+
+        // Load skin
+        assetManager.load(gvcs.default_skin_path, Skin.class);
+
+        finish_loading();
     }
 
     public void finish_loading() {

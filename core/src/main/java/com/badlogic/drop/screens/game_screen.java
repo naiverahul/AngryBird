@@ -1,5 +1,8 @@
-package com.badlogic.drop;
+package com.badlogic.drop.screens;
 
+import com.badlogic.drop.Bird;
+import com.badlogic.drop.MyGame;
+import com.badlogic.drop.physics.LevelGenerator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -24,6 +27,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.ArrayList;
 
+
 public class game_screen implements Screen {
     private final MyGame g_original_game_variable;
     private Stage g_stage;
@@ -46,6 +50,7 @@ public class game_screen implements Screen {
     private boolean isDragging = false;
     private BodyDef bodyDef;
     private FixtureDef fixtureDef;
+
     public game_screen(MyGame game) {
         this.g_original_game_variable = game;
         this.g_viewport = new FitViewport(1920, 1080);
@@ -73,51 +78,12 @@ public class game_screen implements Screen {
         g_bird_on_catapult.getBody().setAwake(false);
 
         // Start with the first bird in the queue
-
-//
-//        // Input processor to handle dragging and releasing the bird
-//        Gdx.input.setInputProcessor(new InputAdapter() {
-//            private Vector2 dragStart = new Vector2();
-//
-//            @Override
-//            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-//                // Start drag if mouse is over the bird
-//                if (g_bird_on_catapult.containsPoint(screenX, screenY)) {
-//                    isDragging = true;
-//                    dragStart.set(screenX, screenY);
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean touchDragged(int screenX, int screenY, int pointer) {
-//                // If dragging, update bird's position
-//                if (isDragging) {
-//                    g_bird_on_catapult.setPosition(screenX, screenY);
-//                }
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-//                if (isDragging) {
-//                    // Calculate the impulse vector when releasing
-//                    Vector2 releasePoint = new Vector2(screenX, screenY);
-//                    Vector2 impulse = calculateImpulse(initialBirdPosition, releasePoint);
-//                    g_bird_on_catapult.applyImpulse(impulse);
-//                    isDragging = false;
-//                }
-//                return true;
-//            }
-//        });
     }
 
     private void g_initialize_birds() {
-
         g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/redbird.png", initialBirdPosition));
         g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/yellowbird.png", initialBirdPosition));
         g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/blackbird.png", initialBirdPosition));
-
     }
 
     private void g_create_UI() {
@@ -130,20 +96,12 @@ public class game_screen implements Screen {
         this.g_pause_button = g_create_button("pause.png");
         this.g_back_button = g_create_button("back.png");
 
-//        g_catapult.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                g_change_catapult_bird();
-//            }
-//        });
         table.add(g_back_button).size(150f, 150f).expand().top().left().pad(20f);
         add_win_lose_screens(table);
         table.add(g_pause_button).size(100f, 100f).top().right().pad(20f);
         table.row();
         table.add(g_catapult).size(200f, 200f).expand().bottom().left().pad(100f);
-
     }
-
 
     private void make_ground(){
         System.out.println("Making ground");
@@ -217,23 +175,21 @@ public class game_screen implements Screen {
                 if (keycode == Input.Keys.UP) {
                     g_change_catapult_bird();
                     g_bird_on_catapult.getBody().setAwake(false);
-
                 } else if (keycode == Input.Keys.DOWN) {
                     current_bird_index = (current_bird_index - 1 + g_bird_list.size()) % g_bird_list.size();
                     g_bird_on_catapult = g_bird_list.get(current_bird_index);
                     g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
                     g_bird_on_catapult.getBody().setAwake(false);
-
-                }else if(keycode == Input.Keys.ESCAPE){
+                } else if (keycode == Input.Keys.ESCAPE) {
                     g_original_game_variable.pause_screen.dispose();
                     g_original_game_variable.pause_screen = new pause_screen(g_original_game_variable);
                     g_original_game_variable.setScreen(g_original_game_variable.pause_screen);
-                }else  if(keycode == Input.Keys.BACKSPACE){
+                } else if (keycode == Input.Keys.BACKSPACE) {
                     g_original_game_variable.level_screen.dispose();
                     g_original_game_variable.level_screen = new level_screen(g_original_game_variable);
                     g_original_game_variable.setScreen(g_original_game_variable.level_screen);
-                }else if(keycode == Input.Keys.ENTER){
-                    float velocityX = (float) (Math.random() * 200000+ 10);
+                } else if (keycode == Input.Keys.ENTER) {
+                    float velocityX = (float) (Math.random() * 200000 + 10);
                     float velocityY = (float) (Math.random() * 150000 + 5);
                     g_bird_on_catapult.getBody().setAwake(true); // Wake up the body
                     g_bird_on_catapult.getBody().setLinearVelocity(velocityX, velocityY);

@@ -1,4 +1,4 @@
-package com.badlogic.drop;
+package com.badlogic.drop.physics;
 
 import com.badlogic.gdx.InputProcessor;
 

@@ -1,6 +1,8 @@
-package com.badlogic.drop;
+package com.badlogic.drop.screens;
 
 import PhysicsActors.PhysicsActor;
+
+import com.badlogic.drop.MyGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;

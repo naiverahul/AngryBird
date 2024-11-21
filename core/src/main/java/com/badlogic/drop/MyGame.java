@@ -1,5 +1,13 @@
 package com.badlogic.drop;
 
+import com.badlogic.drop.screens.LoadingScreen;
+import com.badlogic.drop.screens.Play;
+import com.badlogic.drop.screens.SettingsScreen;
+import com.badlogic.drop.screens.game_screen;
+import com.badlogic.drop.screens.level_screen;
+import com.badlogic.drop.screens.lose_screen;
+import com.badlogic.drop.screens.pause_screen;
+import com.badlogic.drop.screens.win_screen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -8,21 +16,21 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 
 public class MyGame extends Game {
+    public LoadingScreen loadingScreen;
+    public level_screen level_screen;
+    public pause_screen pause_screen;
+    public SettingsScreen settingsScreen;
+    public game_screen game_screen;
+    public win_screen win_screen;
+    public lose_screen lose_screen;
+    public AssetManager assetManager;
+    public Music bkgmusic;
+    public Sound clicksound;
+    public Play play;
     // protected FirstScreen firstScreen;
-    protected LoadingScreen loadingScreen;
-    protected level_screen level_screen;
     // protected level_screen pause_screen;
-    protected pause_screen pause_screen;
-    protected SettingsScreen settingsScreen;
-    protected game_screen game_screen;
     // protected WinScreen win_screen;
-    protected win_screen win_screen;
     // protected LoseScreen lose_screen;
-    protected lose_screen lose_screen;
-    protected AssetManager assetManager;
-    protected Music bkgmusic;
-    protected Sound clicksound;
-    protected Play play;
 
     @Override
     public void create() {
@@ -48,7 +56,7 @@ public class MyGame extends Game {
         win_screen = new win_screen(this);
         // lose_screen = new LoseScreen(this);
         lose_screen = new lose_screen(this);
-        switch_screen(game_screen);
+        switch_screen(loadingScreen);
     }
 
     public void switch_screen(Screen target_screen) {

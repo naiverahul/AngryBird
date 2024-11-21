@@ -1,5 +1,6 @@
-package com.badlogic.drop;
+package com.badlogic.drop.screens;
 
+import com.badlogic.drop.MyGame;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;

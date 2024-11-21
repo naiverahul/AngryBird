@@ -1,0 +1,292 @@
+package com.badlogic.drop;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+
+import java.util.ArrayList;
+
+public class game_screen implements Screen {
+    private final MyGame g_original_game_variable;
+    private Stage g_stage;
+    private FitViewport g_viewport;
+    private Texture g_background;
+    private ArrayList<Bird> g_bird_list;
+    private Bird g_bird_on_catapult;
+    private ImageButton g_catapult, g_pause_button, g_back_button;
+    private int current_bird_index = 0;
+
+    private TextButton g_win_button;
+    private TextButton g_lose_button;
+    private Skin g_skin;
+
+    private LevelGenerator g_level_generator;
+    private World world;
+
+    // Bird drag variables
+    private Vector2 initialBirdPosition;
+    private boolean isDragging = false;
+    private BodyDef bodyDef;
+    private FixtureDef fixtureDef;
+    public game_screen(MyGame game) {
+        this.g_original_game_variable = game;
+        this.g_viewport = new FitViewport(1920, 1080);
+        this.g_stage = new Stage(g_viewport);
+        this.world = new World(new Vector2(0, -9.8f), true);
+        this.bodyDef = new BodyDef();
+        this.fixtureDef =  new FixtureDef();
+        make_ground();
+        this.g_background = new Texture("game_screen.png");
+        this.g_bird_list = new ArrayList<>();
+
+        this.g_level_generator = new LevelGenerator(g_stage);
+        this.g_level_generator.generateLevel(bodyDef, fixtureDef, world);
+
+        // Set the initial bird position over the catapult
+        initialBirdPosition = new Vector2(13000, 22000); // Example catapult position, adjust as needed
+        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/bigbird.png", initialBirdPosition));
+        this.g_bird_on_catapult = g_bird_list.get(current_bird_index);
+
+        g_bird_on_catapult.setPosition(initialBirdPosition);
+
+        g_initialize_birds();
+        g_create_UI();
+
+        g_bird_on_catapult.getBody().setAwake(false);
+
+        // Start with the first bird in the queue
+
+//
+//        // Input processor to handle dragging and releasing the bird
+//        Gdx.input.setInputProcessor(new InputAdapter() {
+//            private Vector2 dragStart = new Vector2();
+//
+//            @Override
+//            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+//                // Start drag if mouse is over the bird
+//                if (g_bird_on_catapult.containsPoint(screenX, screenY)) {
+//                    isDragging = true;
+//                    dragStart.set(screenX, screenY);
+//                }
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean touchDragged(int screenX, int screenY, int pointer) {
+//                // If dragging, update bird's position
+//                if (isDragging) {
+//                    g_bird_on_catapult.setPosition(screenX, screenY);
+//                }
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+//                if (isDragging) {
+//                    // Calculate the impulse vector when releasing
+//                    Vector2 releasePoint = new Vector2(screenX, screenY);
+//                    Vector2 impulse = calculateImpulse(initialBirdPosition, releasePoint);
+//                    g_bird_on_catapult.applyImpulse(impulse);
+//                    isDragging = false;
+//                }
+//                return true;
+//            }
+//        });
+    }
+
+    private void g_initialize_birds() {
+
+        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/redbird.png", initialBirdPosition));
+        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/yellowbird.png", initialBirdPosition));
+        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/blackbird.png", initialBirdPosition));
+
+    }
+
+    private void g_create_UI() {
+        Table table = new Table();
+        table.debug(Table.Debug.all);
+        table.setFillParent(true);
+        g_stage.addActor(table);
+
+        this.g_catapult = g_create_button("catapult.png");
+        this.g_pause_button = g_create_button("pause.png");
+        this.g_back_button = g_create_button("back.png");
+
+//        g_catapult.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                g_change_catapult_bird();
+//            }
+//        });
+        table.add(g_back_button).size(150f, 150f).expand().top().left().pad(20f);
+        add_win_lose_screens(table);
+        table.add(g_pause_button).size(100f, 100f).top().right().pad(20f);
+        table.row();
+        table.add(g_catapult).size(200f, 200f).expand().bottom().left().pad(100f);
+
+    }
+
+
+    private void make_ground(){
+        System.out.println("Making ground");
+        this.bodyDef.type = BodyDef.BodyType.StaticBody;
+        this.bodyDef.position.set(0, 9000);
+
+        ChainShape groundShape = new ChainShape();
+        groundShape.createChain(new Vector2[]{new Vector2(-50000000, 0), new Vector2(50000000, 0)});
+
+        fixtureDef.friction = 0.5f;
+        fixtureDef.restitution = 0;
+        fixtureDef.shape = groundShape;
+        world.createBody(this.bodyDef).createFixture(fixtureDef);
+
+        groundShape.dispose();
+    }
+
+    private void add_win_lose_screens(Table table) {
+        g_skin = new Skin(Gdx.files.internal("uiskin.json"));
+
+        g_win_button = new TextButton("You Win!", g_skin);
+        g_lose_button = new TextButton("You Lose!", g_skin);
+
+        g_win_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                g_original_game_variable.clicksound.play();
+                g_original_game_variable.win_screen.dispose();
+                g_original_game_variable.win_screen = new win_screen(g_original_game_variable);
+                g_original_game_variable.setScreen(g_original_game_variable.win_screen);
+            }
+        });
+        g_lose_button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                g_original_game_variable.clicksound.play();
+                g_original_game_variable.lose_screen.dispose();
+                g_original_game_variable.lose_screen = new lose_screen(g_original_game_variable);
+                g_original_game_variable.setScreen(g_original_game_variable.lose_screen);
+            }
+        });
+
+        table.add(g_win_button).size(150f, 50f).top().right().padTop(10f).padRight(10f);
+        table.add(g_lose_button).size(150f, 50f).top().right().padTop(10f).padRight(10f);
+    }
+
+    private ImageButton g_create_button(String image_path) {
+        return new ImageButton(new TextureRegionDrawable(new Texture(Gdx.files.internal(image_path))));
+    }
+
+    private void g_change_catapult_bird() {
+        current_bird_index = (current_bird_index + 1) % (g_bird_list.size());
+        g_bird_on_catapult = g_bird_list.get(current_bird_index);
+        g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
+    }
+
+    private Vector2 calculateImpulse(Vector2 start, Vector2 end) {
+        Vector2 direction = start.cpy().sub(end); // Vector from release point to start
+        float distance = direction.len();         // Calculate the magnitude
+        direction.nor();                          // Normalize to get the direction
+        float forceMultiplier = 10f;              // Adjust this factor to control force
+        return direction.scl(distance * forceMultiplier); // Scale by distance
+    }
+
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(g_stage);
+        Gdx.input.setInputProcessor(new InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                if (keycode == Input.Keys.UP) {
+                    g_change_catapult_bird();
+                    g_bird_on_catapult.getBody().setAwake(false);
+
+                } else if (keycode == Input.Keys.DOWN) {
+                    current_bird_index = (current_bird_index - 1 + g_bird_list.size()) % g_bird_list.size();
+                    g_bird_on_catapult = g_bird_list.get(current_bird_index);
+                    g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
+                    g_bird_on_catapult.getBody().setAwake(false);
+
+                }else if(keycode == Input.Keys.ESCAPE){
+                    g_original_game_variable.pause_screen.dispose();
+                    g_original_game_variable.pause_screen = new pause_screen(g_original_game_variable);
+                    g_original_game_variable.setScreen(g_original_game_variable.pause_screen);
+                }else  if(keycode == Input.Keys.BACKSPACE){
+                    g_original_game_variable.level_screen.dispose();
+                    g_original_game_variable.level_screen = new level_screen(g_original_game_variable);
+                    g_original_game_variable.setScreen(g_original_game_variable.level_screen);
+                }else if(keycode == Input.Keys.ENTER){
+                    float velocityX = (float) (Math.random() * 200000+ 10);
+                    float velocityY = (float) (Math.random() * 150000 + 5);
+                    g_bird_on_catapult.getBody().setAwake(true); // Wake up the body
+                    g_bird_on_catapult.getBody().setLinearVelocity(velocityX, velocityY);
+                }
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void render(float delta) {
+        ScreenUtils.clear(Color.SKY);
+
+        // Begin drawing
+        g_stage.getBatch().begin();
+        g_stage.getBatch().draw(g_background, 0, 0, g_viewport.getWorldWidth(), g_viewport.getWorldHeight());
+
+        // Draw the current bird scaled down on the catapult
+        if (g_bird_on_catapult != null) {
+            Vector2 birdPosition = g_bird_on_catapult.getBody().getPosition();
+            float birdWidth = g_bird_on_catapult.getTexture().getWidth() * 0.25f;
+            float birdHeight = g_bird_on_catapult.getTexture().getHeight() * 0.25f;
+            g_stage.getBatch().draw(g_bird_on_catapult.getTexture(), birdPosition.x, birdPosition.y, birdWidth, birdHeight);
+        }
+
+        g_stage.getBatch().end();
+
+        // Stage needs to act and draw UI elements
+        g_stage.act(delta);
+        g_stage.draw();
+
+        // Step the physics simulation
+        world.step(1 / 60f, 6, 2);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        g_viewport.update(width, height, true);
+    }
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void hide() {}
+
+    @Override
+    public void dispose() {
+        g_background.dispose();
+        g_stage.dispose();
+        world.dispose();
+    }
+}

@@ -1,6 +1,8 @@
 package com.badlogic.drop;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -8,15 +10,23 @@ import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 
 public class Bird extends Actor {
     private Texture birdTexture;
     private Body birdBody;
+    private Vector2 initialPosition;
+    private boolean isDragging;
+    private Vector2 dragStart;
 
-    public Bird(BodyDef bodyDef, FixtureDef fixtureDef, World world, String texturePath, Vector2 position) {
-        birdTexture = new Texture(texturePath);
+    public Bird(World world, String texturePath, Vector2 position) {
+        this.birdTexture = new Texture(Gdx.files.internal(texturePath));
+        this.initialPosition = position;
+        this.isDragging = false;
 
         // Create body definition
+        BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position);
 
@@ -28,6 +38,7 @@ public class Bird extends Actor {
         shape.setRadius(birdTexture.getWidth() / 2f / 100f); // Adjusted for Box2D scale
 
         // Create fixture definition
+        FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;
@@ -38,47 +49,63 @@ public class Bird extends Actor {
 
         // Dispose shape
         shape.dispose();
+
+        // Add input listener for dragging
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                isDragging = true;
+                dragStart = new Vector2(x, y);
+                return true;
+            }
+
+            @Override
+            public void touchDragged(InputEvent event, float x, float y, int pointer) {
+                if (isDragging) {
+                    Vector2 dragEnd = new Vector2(x, y);
+                    Vector2 dragVector = dragStart.cpy().sub(dragEnd);
+                    birdBody.setTransform(initialPosition.cpy().sub(dragVector.scl(0.1f)), birdBody.getAngle());
+                }
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if (isDragging) {
+                    isDragging = false;
+                    Vector2 dragEnd = new Vector2(x, y);
+                    Vector2 dragVector = dragStart.cpy().sub(dragEnd);
+                    Vector2 impulse = dragVector.scl(10f); // Adjust this factor to control launch force
+                    birdBody.applyLinearImpulse(impulse, birdBody.getWorldCenter(), true);
+                }
+            }
+        });
     }
 
-    // Returns the texture of the bird
-    public Texture getTexture() {
-        return birdTexture;
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        // Update the actor's position to match the body's position
+        setPosition(birdBody.getPosition().x * 100f - birdTexture.getWidth() / 2f, birdBody.getPosition().y * 100f - birdTexture.getHeight() / 2f);
     }
 
-    // Returns the Box2D body of the bird
-    public Body getBody() {
-        return birdBody;
-    }
-    // Applies an impulse to the bird
-    public void applyImpulse(Vector2 impulse) {
-        birdBody.applyLinearImpulse(impulse, birdBody.getWorldCenter(), true);
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        batch.draw(birdTexture, getX(), getY());
     }
 
-    // Sets the position of the bird
-    public void setPosition(Vector2 newPosition) {
-        birdBody.setTransform(newPosition.x / 100f, newPosition.y / 100f, birdBody.getAngle());
-    }
-
-    // Utility method for setting position using separate x and y values
-    public void setPosition(float x, float y) {
-        birdBody.setTransform(x / 100f, y / 100f, birdBody.getAngle());
-    }
-
-    // Disposes of the bird's texture when no longer needed
     public void dispose() {
         birdTexture.dispose();
     }
 
-    // Check if a point is inside the bird's texture bounds (for dragging)
-    public boolean containsPoint(int screenX, int screenY) {
-        Vector2 birdPos = birdBody.getPosition();
-        float radius = birdTexture.getWidth() / 2f;
+    public Texture getTexture() {
+        return birdTexture;
+    }
 
-        // Convert bird's Box2D position to screen coordinates
-        float birdX = birdPos.x * 100f;
-        float birdY = birdPos.y * 100f;
+    public Body getBody() {
+        return birdBody;
+    }
 
-        // Check if the click is within the bird's circle bounds
-        return Math.pow(screenX - birdX, 2) + Math.pow(screenY - birdY, 2) <= Math.pow(radius, 2);
+    public void setPosition(Vector2 newPosition) {
+        birdBody.setTransform(newPosition.x / 100f, newPosition.y / 100f, birdBody.getAngle());
     }
 }

@@ -27,7 +27,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import java.util.ArrayList;
 
-
 public class game_screen implements Screen {
     private final MyGame g_original_game_variable;
     private Stage g_stage;
@@ -57,7 +56,7 @@ public class game_screen implements Screen {
         this.g_stage = new Stage(g_viewport);
         this.world = new World(new Vector2(0, -9.8f), true);
         this.bodyDef = new BodyDef();
-        this.fixtureDef =  new FixtureDef();
+        this.fixtureDef = new FixtureDef();
         make_ground();
         this.g_background = new Texture("game_screen.png");
         this.g_bird_list = new ArrayList<>();
@@ -67,7 +66,7 @@ public class game_screen implements Screen {
 
         // Set the initial bird position over the catapult
         initialBirdPosition = new Vector2(13000, 22000); // Example catapult position, adjust as needed
-        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/bigbird.png", initialBirdPosition));
+        g_bird_list.add(new Bird(world, "Birdimages/bigbird.png", initialBirdPosition));
         this.g_bird_on_catapult = g_bird_list.get(current_bird_index);
 
         g_bird_on_catapult.setPosition(initialBirdPosition);
@@ -81,9 +80,9 @@ public class game_screen implements Screen {
     }
 
     private void g_initialize_birds() {
-        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/redbird.png", initialBirdPosition));
-        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/yellowbird.png", initialBirdPosition));
-        g_bird_list.add(new Bird(bodyDef,fixtureDef,world, "Birdimages/blackbird.png", initialBirdPosition));
+        g_bird_list.add(new Bird(world, "Birdimages/redbird.png", initialBirdPosition));
+        g_bird_list.add(new Bird(world, "Birdimages/yellowbird.png", initialBirdPosition));
+        g_bird_list.add(new Bird(world, "Birdimages/blackbird.png", initialBirdPosition));
     }
 
     private void g_create_UI() {
@@ -103,7 +102,7 @@ public class game_screen implements Screen {
         table.add(g_catapult).size(200f, 200f).expand().bottom().left().pad(100f);
     }
 
-    private void make_ground(){
+    private void make_ground() {
         System.out.println("Making ground");
         this.bodyDef.type = BodyDef.BodyType.StaticBody;
         this.bodyDef.position.set(0, 9000);

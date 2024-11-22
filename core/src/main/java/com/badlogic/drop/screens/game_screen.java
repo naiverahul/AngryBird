@@ -6,9 +6,11 @@ import com.badlogic.drop.physics.LevelGenerator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
@@ -50,11 +52,16 @@ public class game_screen implements Screen {
     private BodyDef bodyDef;
     private FixtureDef fixtureDef;
 
+    private Vector2 dragStart;
+    private Vector2 dragEnd;
+    private ShapeRenderer shapeRenderer;
+
     public game_screen(MyGame game) {
         this.g_original_game_variable = game;
         this.g_viewport = new FitViewport(1920, 1080);
         this.g_stage = new Stage(g_viewport);
         this.world = new World(new Vector2(0, -9.8f), true);
+        shapeRenderer = new ShapeRenderer();
         this.bodyDef = new BodyDef();
         this.fixtureDef = new FixtureDef();
         make_ground();
@@ -108,7 +115,7 @@ public class game_screen implements Screen {
         this.bodyDef.position.set(0, 9000);
 
         ChainShape groundShape = new ChainShape();
-        groundShape.createChain(new Vector2[]{new Vector2(-50000000, 0), new Vector2(50000000, 0)});
+        groundShape.createChain(new Vector2[] { new Vector2(-50000000, 0), new Vector2(50000000, 0) });
 
         fixtureDef.friction = 0.5f;
         fixtureDef.restitution = 0;
@@ -159,16 +166,17 @@ public class game_screen implements Screen {
 
     private Vector2 calculateImpulse(Vector2 start, Vector2 end) {
         Vector2 direction = start.cpy().sub(end); // Vector from release point to start
-        float distance = direction.len();         // Calculate the magnitude
-        direction.nor();                          // Normalize to get the direction
-        float forceMultiplier = 10f;              // Adjust this factor to control force
+        float distance = direction.len(); // Calculate the magnitude
+        direction.nor(); // Normalize to get the direction
+        float forceMultiplier = 10f; // Adjust this factor to control force
         return direction.scl(distance * forceMultiplier); // Scale by distance
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(g_stage);
-        Gdx.input.setInputProcessor(new InputAdapter() {
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(g_stage);
+        inputMultiplexer.addProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.UP) {
@@ -195,7 +203,36 @@ public class game_screen implements Screen {
                 }
                 return true;
             }
+
+            @Override
+            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+                isDragging = true;
+                dragStart = g_stage.screenToStageCoordinates(new Vector2(screenX, screenY));
+                return true;
+            }
+
+            @Override
+            public boolean touchDragged(int screenX, int screenY, int pointer) {
+                if (isDragging) {
+                    dragEnd = g_stage.screenToStageCoordinates(new Vector2(screenX, screenY));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+                if (isDragging) {
+                    isDragging = false;
+                    dragEnd = g_stage.screenToStageCoordinates(new Vector2(screenX, screenY));
+                    Vector2 impulse = calculateImpulse(dragStart, dragEnd);
+                    g_bird_on_catapult.getBody().setAwake(true); // Wake up the body
+                    g_bird_on_catapult.getBody().applyLinearImpulse(impulse, g_bird_on_catapult.getBody().getWorldCenter(), true);
+                }
+                return true;
+            }
+
         });
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override
@@ -211,10 +248,26 @@ public class game_screen implements Screen {
             Vector2 birdPosition = g_bird_on_catapult.getBody().getPosition();
             float birdWidth = g_bird_on_catapult.getTexture().getWidth() * 0.25f;
             float birdHeight = g_bird_on_catapult.getTexture().getHeight() * 0.25f;
-            g_stage.getBatch().draw(g_bird_on_catapult.getTexture(), birdPosition.x, birdPosition.y, birdWidth, birdHeight);
+            g_stage.getBatch().draw(g_bird_on_catapult.getTexture(), birdPosition.x, birdPosition.y, birdWidth,
+                    birdHeight);
         }
 
         g_stage.getBatch().end();
+
+        // Draw the drag path
+    if (isDragging && dragStart != null && dragEnd != null) {
+        // g_stage.getBatch().begin();
+        // g_stage.getBatch().setColor(Color.RED);
+        // g_stage.getBatch().drawLine(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
+        // g_stage.getBatch().setColor(Color.WHITE);
+        // g_stage.getBatch().end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.line(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
+        shapeRenderer.end();
+    }
+
 
         // Stage needs to act and draw UI elements
         g_stage.act(delta);
@@ -230,13 +283,16 @@ public class game_screen implements Screen {
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
-    public void hide() {}
+    public void hide() {
+    }
 
     @Override
     public void dispose() {

@@ -1,42 +1,52 @@
 package com.badlogic.drop;
 
+import com.badlogic.drop.user.DataManager;
+import com.badlogic.drop.user.Login_and_SignUp;
+import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 
+import javax.swing.*;
+
 public class Main extends Game {
     private MyGame myGame;
-    public static final String title = "Udja Kale Kaua";
+    private User currentUser;
 
     @Override
     public void create() {
-            Gdx.app.log(title, ": create()");
-            myGame = new MyGame();
+        User[] currentUserHolder = new User[1];
+        Login_and_SignUp loginAndSignUp = new Login_and_SignUp(currentUserHolder);
 
-        // Call the create method on MyGame to set up screens
+        SwingUtilities.invokeLater(loginAndSignUp::showLoginSignupDialog);
+
+        // Wait for the user to complete login/signup before starting the game
+        while (currentUserHolder[0] == null) {
+            try {
+                Thread.sleep(100); // Sleep for a short period to avoid busy-waiting
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        this.currentUser = currentUserHolder[0];
+        Gdx.app.log("Main", "Game started with user: " + currentUser.getName());
+
+        myGame = new MyGame(currentUser);
         myGame.create();
     }
 
     @Override
     public void render() {
-//        Gdx.app.log(title, ": render()");
-
-        // Delegate rendering to MyGame, which handles the current screen's rendering
         myGame.render();
     }
 
     @Override
     public void dispose() {
-        // Dispose of resources in MyGame
-//        Gdx.app.log(title, ": dispose()");
-
         myGame.dispose();
     }
 
     @Override
     public void resize(int width, int height) {
-        // Delegate resizing to MyGame
-//        Gdx.app.log(title, ": resize()");
-
         myGame.resize(width, height);
     }
 }

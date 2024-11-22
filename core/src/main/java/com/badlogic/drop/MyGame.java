@@ -8,6 +8,7 @@ import com.badlogic.drop.screens.level_screen;
 import com.badlogic.drop.screens.lose_screen;
 import com.badlogic.drop.screens.pause_screen;
 import com.badlogic.drop.screens.win_screen;
+import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -27,11 +28,15 @@ public class MyGame extends Game {
     public Music bkgmusic;
     public Sound clicksound;
     public Play play;
+    public User current_user;
     // protected FirstScreen firstScreen;
     // protected level_screen pause_screen;
     // protected WinScreen win_screen;
     // protected LoseScreen lose_screen;
 
+    public MyGame(User current_user) {
+        this.current_user = current_user;
+    }
     @Override
     public void create() {
         assetManager = new AssetManager();

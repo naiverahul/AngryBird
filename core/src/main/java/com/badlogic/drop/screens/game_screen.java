@@ -3,6 +3,7 @@ package com.badlogic.drop.screens;
 import com.badlogic.drop.Bird;
 import com.badlogic.drop.MyGame;
 import com.badlogic.drop.physics.LevelGenerator;
+import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -12,10 +13,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -27,9 +25,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class game_screen implements Screen {
+public class game_screen implements Screen, Serializable {
     private final MyGame g_original_game_variable;
     private Stage g_stage;
     private FitViewport g_viewport;
@@ -37,6 +36,7 @@ public class game_screen implements Screen {
     private ArrayList<Bird> g_bird_list;
     private Bird g_bird_on_catapult;
     private ImageButton g_catapult, g_pause_button, g_back_button;
+    private Box2DDebugRenderer g_debug_renderer;
     private int current_bird_index = 0;
 
     private TextButton g_win_button;
@@ -55,8 +55,10 @@ public class game_screen implements Screen {
     private Vector2 dragStart;
     private Vector2 dragEnd;
     private ShapeRenderer shapeRenderer;
+    private User current_user;
 
     public game_screen(MyGame game) {
+        this.current_user = game.current_user;
         this.g_original_game_variable = game;
         this.g_viewport = new FitViewport(1920, 1080);
         this.g_stage = new Stage(g_viewport);
@@ -67,6 +69,7 @@ public class game_screen implements Screen {
         make_ground();
         this.g_background = new Texture("game_screen.png");
         this.g_bird_list = new ArrayList<>();
+        this.g_debug_renderer = new Box2DDebugRenderer();
 
         this.g_level_generator = new LevelGenerator(g_stage);
         this.g_level_generator.generateLevel(bodyDef, fixtureDef, world);
@@ -82,7 +85,7 @@ public class game_screen implements Screen {
         g_create_UI();
 
         g_bird_on_catapult.getBody().setAwake(false);
-
+        addContactListener();
         // Start with the first bird in the queue
     }
 
@@ -112,7 +115,7 @@ public class game_screen implements Screen {
     private void make_ground() {
         System.out.println("Making ground");
         this.bodyDef.type = BodyDef.BodyType.StaticBody;
-        this.bodyDef.position.set(0, 9000);
+        this.bodyDef.position.set(0, 20000);
 
         ChainShape groundShape = new ChainShape();
         groundShape.createChain(new Vector2[] { new Vector2(-50000000, 0), new Vector2(50000000, 0) });
@@ -123,6 +126,32 @@ public class game_screen implements Screen {
         world.createBody(this.bodyDef).createFixture(fixtureDef);
 
         groundShape.dispose();
+    }
+
+
+    private void addContactListener() {
+        world.setContactListener(new ContactListener() {
+            @Override
+            public void beginContact(Contact contact) {
+                Fixture a = contact.getFixtureA();
+                Fixture b = contact.getFixtureB();
+
+                System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                System.out.println("Contact ended");
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+            }
+        });
     }
 
     private void add_win_lose_screens(Table table) {
@@ -138,6 +167,8 @@ public class game_screen implements Screen {
                 g_original_game_variable.win_screen.dispose();
                 g_original_game_variable.win_screen = new win_screen(g_original_game_variable);
                 g_original_game_variable.setScreen(g_original_game_variable.win_screen);
+                current_user.incrementLevel();
+                System.out.println("Level incremented to: " + current_user.getLevel());
             }
         });
         g_lose_button.addListener(new ClickListener() {
@@ -161,14 +192,17 @@ public class game_screen implements Screen {
     private void g_change_catapult_bird() {
         current_bird_index = (current_bird_index + 1) % (g_bird_list.size());
         g_bird_on_catapult = g_bird_list.get(current_bird_index);
+        g_bird_on_catapult.getBody().setAwake(false);
+        while (g_bird_on_catapult.getBody().isAwake()) {
+            // Wait for the body to be set to sleep
+        }
         g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
     }
-
     private Vector2 calculateImpulse(Vector2 start, Vector2 end) {
         Vector2 direction = start.cpy().sub(end); // Vector from release point to start
         float distance = direction.len(); // Calculate the magnitude
         direction.nor(); // Normalize to get the direction
-        float forceMultiplier = 10f; // Adjust this factor to control force
+        float forceMultiplier = 1000f; // Adjust this factor to control force
         return direction.scl(distance * forceMultiplier); // Scale by distance
     }
 
@@ -181,12 +215,11 @@ public class game_screen implements Screen {
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.UP) {
                     g_change_catapult_bird();
-                    g_bird_on_catapult.getBody().setAwake(false);
                 } else if (keycode == Input.Keys.DOWN) {
                     current_bird_index = (current_bird_index - 1 + g_bird_list.size()) % g_bird_list.size();
                     g_bird_on_catapult = g_bird_list.get(current_bird_index);
-                    g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
                     g_bird_on_catapult.getBody().setAwake(false);
+                    g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
                 } else if (keycode == Input.Keys.ESCAPE) {
                     g_original_game_variable.pause_screen.dispose();
                     g_original_game_variable.pause_screen = new pause_screen(g_original_game_variable);
@@ -233,6 +266,8 @@ public class game_screen implements Screen {
 
         });
         Gdx.input.setInputProcessor(inputMultiplexer);
+        g_debug_renderer.render(world, g_viewport.getCamera().combined);
+
     }
 
     @Override

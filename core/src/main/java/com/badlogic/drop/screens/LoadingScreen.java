@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -30,7 +29,6 @@ public class LoadingScreen implements Screen {
     private SpriteBatch batch;
     private ProgressBar progressBar;
     private ImageButton startButton, exitButton;
-    private TextField nameField;
     private Label nameLabel;
     private AssetManager assetManager;
     private MyGame game;
@@ -58,9 +56,7 @@ public class LoadingScreen implements Screen {
         stage = new Stage();
         setupCameraAndViewport();
         nameLabel = new Label("Enter Your Name:", skin);
-        nameField = new TextField("", skin);
         nameLabel.setVisible(false);
-        nameField.setVisible(false);
         setupProgressBar(skin);
         setupUIComponents();
         addInputListeners();
@@ -103,14 +99,7 @@ public class LoadingScreen implements Screen {
         startButton.setPosition(835f, viewport.getWorldHeight() / 18f);
         exitButton.setSize(250f, 140f);
         exitButton.setPosition(0, 0);
-        nameLabel.setPosition(760f, 600f);
-        nameLabel.setFontScale(3.0f);
-        nameField.setPosition(760f, 400f);
-        nameField.setSize(400f, 80f);
-        nameField.setCursorPosition((int) nameField.getWidth() / 2);
-        nameField.setColor(Color.NAVY);
         stage.addActor(nameLabel);
-        stage.addActor(nameField);
         stage.addActor(startButton);
         stage.addActor(exitButton);
     }
@@ -119,13 +108,7 @@ public class LoadingScreen implements Screen {
         startButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (!nameDialogVisible) {
-                    nameLabel.setVisible(true);
-                    nameField.setVisible(true);
-                    nameDialogVisible = true;
-                } else {
-                    game.switch_screen(game.level_screen);
-                }
+                game.switch_screen(game.level_screen);
             }
         });
 
@@ -136,17 +119,16 @@ public class LoadingScreen implements Screen {
                 Gdx.app.exit();
             }
         });
+
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.ENTER) {
                     if (!nameDialogVisible) {
                         nameLabel.setVisible(true);
-                        nameField.setVisible(true);
                         nameDialogVisible = true;
                     } else {
-                        game.switch_screen(game.level_screen
-                        );
+                        game.switch_screen(game.level_screen);
                     }
                     return true;
                 } else if (keycode == Input.Keys.ESCAPE) {
@@ -162,8 +144,6 @@ public class LoadingScreen implements Screen {
     @Override
     public void show() {
         Gdx.app.log("LoadingScreen", "Loading screen shown");
-
-
     }
 
     @Override

@@ -193,6 +193,7 @@
 package com.badlogic.drop.screens;
 
 import com.badlogic.drop.MyGame;
+import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -215,8 +216,10 @@ public class level_screen implements Screen {
     private Texture backgroundTexture;
     private ImageButton l_back_button, l_1_button, l_2_button, l_3_button, l_4_button, l_settings_button;
     private game_screen l_game_screen;
+    public User current_user;
 
     public level_screen(MyGame game) {
+        this.current_user = game.current_user;
         this.game = game;
         this.assetManager = assetManager;
         this.stage = new Stage(new FitViewport(1920, 1080));
@@ -269,10 +272,27 @@ public class level_screen implements Screen {
             }
         });
 
-        l_level_button_listener(l_1_button);
-        l_level_button_listener(l_2_button);
-        l_level_button_listener(l_3_button);
-        l_level_button_listener(l_4_button);
+        int level = current_user.getLevel();
+        switch (level) {
+            case 1:
+                l_level_button_listener(l_1_button);
+                break;
+            case 2:
+                l_level_button_listener(l_1_button);
+                l_level_button_listener(l_2_button);
+                break;
+            case 3:
+                l_level_button_listener(l_1_button);
+                l_level_button_listener(l_2_button);
+                l_level_button_listener(l_3_button);
+                break;
+            case 4:
+                l_level_button_listener(l_1_button);
+                l_level_button_listener(l_2_button);
+                l_level_button_listener(l_3_button);
+                l_level_button_listener(l_4_button);
+                break;
+        }
 
 
 

@@ -61,7 +61,7 @@ public class MyGame extends Game {
         win_screen = new win_screen(this);
         // lose_screen = new LoseScreen(this);
         lose_screen = new lose_screen(this);
-        switch_screen(loadingScreen);
+        switch_screen(game_screen);
     }
 
     public void switch_screen(Screen target_screen) {

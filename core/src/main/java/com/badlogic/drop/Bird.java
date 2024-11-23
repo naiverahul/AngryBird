@@ -79,6 +79,9 @@ public class Bird extends Actor {
                 }
             }
         });
+
+        birdBody.setUserData(this);
+
     }
 
     @Override

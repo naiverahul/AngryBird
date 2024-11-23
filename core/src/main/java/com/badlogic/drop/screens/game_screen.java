@@ -2,6 +2,7 @@ package com.badlogic.drop.screens;
 
 import com.badlogic.drop.Bird;
 import com.badlogic.drop.MyGame;
+import com.badlogic.drop.Pig;
 import com.badlogic.drop.physics.LevelGenerator;
 import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Gdx;
@@ -39,6 +40,8 @@ public class game_screen implements Screen, Serializable {
     private Box2DDebugRenderer g_debug_renderer;
     private int current_bird_index = 0;
 
+    private ArrayList<Pig> g_pig_list;
+
     private TextButton g_win_button;
     private TextButton g_lose_button;
     private Skin g_skin;
@@ -74,6 +77,9 @@ public class game_screen implements Screen, Serializable {
         this.g_level_generator = new LevelGenerator(g_stage);
         this.g_level_generator.generateLevel(bodyDef, fixtureDef, world);
 
+        this.g_pig_list = new ArrayList<>();
+        g_initialize_pigs();
+
         // Set the initial bird position over the catapult
         initialBirdPosition = new Vector2(13000, 22000); // Example catapult position, adjust as needed
         g_bird_list.add(new Bird(world, "Birdimages/bigbird.png", initialBirdPosition));
@@ -82,11 +88,18 @@ public class game_screen implements Screen, Serializable {
         g_bird_on_catapult.setPosition(initialBirdPosition);
 
         g_initialize_birds();
+
         g_create_UI();
 
         g_bird_on_catapult.getBody().setAwake(false);
         addContactListener();
         // Start with the first bird in the queue
+    }
+
+    private void g_initialize_pigs() {
+        g_pig_list.add(new Pig(world, "Pigimages/pig.png", new Vector2(15000, 22000), 100));
+        g_pig_list.add(new Pig(world, "Pigimages/pig2.png", new Vector2(16000, 22000), 100));
+
     }
 
     private void g_initialize_birds() {
@@ -128,13 +141,20 @@ public class game_screen implements Screen, Serializable {
         groundShape.dispose();
     }
 
-
     private void addContactListener() {
         world.setContactListener(new ContactListener() {
             @Override
             public void beginContact(Contact contact) {
                 Fixture a = contact.getFixtureA();
                 Fixture b = contact.getFixtureB();
+
+                // Check if a bird collided with a pig
+                if ((a.getBody().getUserData() instanceof Bird && b.getBody().getUserData() instanceof Pig) ||
+                        (a.getBody().getUserData() instanceof Pig && b.getBody().getUserData() instanceof Bird)) {
+                    Pig pig = (a.getBody().getUserData() instanceof Pig) ? (Pig) a.getBody().getUserData()
+                            : (Pig) b.getBody().getUserData();
+                    pig.takeDamage(50); // Example damage value
+                }
 
                 System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());
             }
@@ -198,6 +218,7 @@ public class game_screen implements Screen, Serializable {
         }
         g_bird_on_catapult.setPosition(initialBirdPosition); // Reset to initial position
     }
+
     private Vector2 calculateImpulse(Vector2 start, Vector2 end) {
         Vector2 direction = start.cpy().sub(end); // Vector from release point to start
         float distance = direction.len(); // Calculate the magnitude
@@ -259,12 +280,18 @@ public class game_screen implements Screen, Serializable {
                     dragEnd = g_stage.screenToStageCoordinates(new Vector2(screenX, screenY));
                     Vector2 impulse = calculateImpulse(dragStart, dragEnd);
                     g_bird_on_catapult.getBody().setAwake(true); // Wake up the body
-                    g_bird_on_catapult.getBody().applyLinearImpulse(impulse, g_bird_on_catapult.getBody().getWorldCenter(), true);
+                    g_bird_on_catapult.getBody().applyLinearImpulse(impulse,
+                            g_bird_on_catapult.getBody().getWorldCenter(), true);
                 }
                 return true;
             }
 
         });
+
+        for (Pig pig : g_pig_list) {
+            g_stage.addActor(pig);
+        }
+
         Gdx.input.setInputProcessor(inputMultiplexer);
         g_debug_renderer.render(world, g_viewport.getCamera().combined);
 
@@ -290,19 +317,18 @@ public class game_screen implements Screen, Serializable {
         g_stage.getBatch().end();
 
         // Draw the drag path
-    if (isDragging && dragStart != null && dragEnd != null) {
-        // g_stage.getBatch().begin();
-        // g_stage.getBatch().setColor(Color.RED);
-        // g_stage.getBatch().drawLine(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
-        // g_stage.getBatch().setColor(Color.WHITE);
-        // g_stage.getBatch().end();
+        if (isDragging && dragStart != null && dragEnd != null) {
+            // g_stage.getBatch().begin();
+            // g_stage.getBatch().setColor(Color.RED);
+            // g_stage.getBatch().drawLine(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
+            // g_stage.getBatch().setColor(Color.WHITE);
+            // g_stage.getBatch().end();
 
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.RED);
-        shapeRenderer.line(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
-        shapeRenderer.end();
-    }
-
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.RED);
+            shapeRenderer.line(dragStart.x, dragStart.y, dragEnd.x, dragEnd.y);
+            shapeRenderer.end();
+        }
 
         // Stage needs to act and draw UI elements
         g_stage.act(delta);

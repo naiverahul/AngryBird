@@ -22,7 +22,8 @@ public class Pig extends Actor {
 
         // Create body definition
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
+        // bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(position);
 
         // Create body in the world
@@ -51,7 +52,11 @@ public class Pig extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
-        // Update the actor's position to match the body's position
+        // // Update the actor's position to match the body's position
+        // // setPosition(pigBody.getPosition().x * 100f - pigTexture.getWidth() / 2f, pigBody.getPosition().y * 100f - pigTexture.getHeight() / 2f);
+
+        // setPosition(pigBody.getPosition().x * 100f - pigTexture.getWidth() / 2f, pigBody.getPosition().y * 100f - pigTexture.getHeight() / 2f);
+
         setPosition(pigBody.getPosition().x * 100f - pigTexture.getWidth() / 2f, pigBody.getPosition().y * 100f - pigTexture.getHeight() / 2f);
     }
 

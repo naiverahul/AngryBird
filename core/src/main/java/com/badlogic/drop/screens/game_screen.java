@@ -154,6 +154,12 @@ public class game_screen implements Screen, Serializable {
                     Pig pig = (a.getBody().getUserData() instanceof Pig) ? (Pig) a.getBody().getUserData()
                             : (Pig) b.getBody().getUserData();
                     pig.takeDamage(50); // Example damage value
+                    // Apply an impulse to the pig to make it move away
+                    Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
+                    Vector2 pigPosition = pig.getBody().getPosition();
+                    Vector2 impulseDirection = pigPosition.cpy().sub(collisionPoint).nor();
+                    float impulseStrength = 10f; // Adjust this value as needed
+                    pig.getBody().applyLinearImpulse(impulseDirection.scl(impulseStrength), pigPosition, true);
                 }
 
                 System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());

@@ -384,7 +384,7 @@ public class game_screen implements Screen, Serializable {
 
         // Step the physics simulation
         world.step(1 / 60f, 10, 4);
-        // g_debug_renderer.render(world, viewport.getCamera().combined);
+        deburenderer.render(world, viewport.getCamera().combined);
 
     }
 

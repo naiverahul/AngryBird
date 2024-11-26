@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -40,7 +41,7 @@ public class game_screen implements Screen, Serializable {
     private Box2DDebugRenderer g_debug_renderer;
     private int current_bird_index = 0;
 
-    private ArrayList<Pig> g_pig_list;
+    // private ArrayList<Pig> g_pig_list;
 
     private TextButton g_win_button;
     private TextButton g_lose_button;
@@ -74,11 +75,16 @@ public class game_screen implements Screen, Serializable {
         this.g_bird_list = new ArrayList<>();
         this.g_debug_renderer = new Box2DDebugRenderer();
 
-        this.g_level_generator = new LevelGenerator(g_stage);
-        this.g_level_generator.generateLevel(bodyDef, fixtureDef, world);
+        // old level generator.
+        // this.g_level_generator = new LevelGenerator(g_stage);
+        // this.g_level_generator.generateLevel(bodyDef, fixtureDef, world);
 
-        this.g_pig_list = new ArrayList<>();
-        g_initialize_pigs();
+        this.g_level_generator = new LevelGenerator(game, world, g_stage);
+        this.g_level_generator.generateLevel(bodyDef, fixtureDef);
+
+
+        // this.g_pig_list = new ArrayList<>();
+        // g_initialize_pigs();
 
         // Set the initial bird position over the catapult
         initialBirdPosition = new Vector2(13000, 22000); // Example catapult position, adjust as needed
@@ -96,11 +102,11 @@ public class game_screen implements Screen, Serializable {
         // Start with the first bird in the queue
     }
 
-    private void g_initialize_pigs() {
-        g_pig_list.add(new Pig(world, "Pigimages/pig.png", new Vector2(15000, 22000), 100));
-        g_pig_list.add(new Pig(world, "Pigimages/pig2.png", new Vector2(16000, 22000), 100));
+    // private void g_initialize_pigs() {
+    //     g_pig_list.add(new Pig(world, "Pigimages/pig.png", new Vector2(15000, 22000), 100));
+    //     g_pig_list.add(new Pig(world, "Pigimages/pig2.png", new Vector2(16000, 22000), 100));
 
-    }
+    // }
 
     private void g_initialize_birds() {
         g_bird_list.add(new Bird(world, "Birdimages/redbird.png", initialBirdPosition));
@@ -294,12 +300,12 @@ public class game_screen implements Screen, Serializable {
 
         });
 
-        for (Pig pig : g_pig_list) {
-            g_stage.addActor(pig);
-        }
+        // for (Pig pig : g_pig_list) {
+        //     g_stage.addActor(pig);
+        // }
 
         Gdx.input.setInputProcessor(inputMultiplexer);
-        g_debug_renderer.render(world, g_viewport.getCamera().combined);
+        // g_debug_renderer.render(world, g_viewport.getCamera().combined);
 
     }
 
@@ -341,7 +347,8 @@ public class game_screen implements Screen, Serializable {
         g_stage.draw();
 
         // Step the physics simulation
-        world.step(1 / 60f, 6, 2);
+        world.step(1 / 60f, 10, 4);
+        // g_debug_renderer.render(world, g_viewport.getCamera().combined);
     }
 
     @Override

@@ -56,6 +56,7 @@ public class Bird extends Actor {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 isDragging = true;
                 dragStart = new Vector2(x, y);
+                birdBody.setAwake(!isDragging);
                 return true;
             }
 
@@ -65,6 +66,7 @@ public class Bird extends Actor {
                     Vector2 dragEnd = new Vector2(x, y);
                     Vector2 dragVector = dragStart.cpy().sub(dragEnd);
                     birdBody.setTransform(initialPosition.cpy().sub(dragVector.scl(0.1f)), birdBody.getAngle());
+                    isDragging=false;
                 }
             }
 

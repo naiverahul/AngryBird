@@ -12,79 +12,81 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class Pig extends Actor {
-    private Texture pigTexture;
-    private Body pigBody;
-    private int health;
+    private Texture pig_texture;
+    private Body pig_body;
+    private Vector2 initial_position;
+    private int health = 10;
 
-    public Pig(World world, String texturePath, Vector2 position, int health) {
-        this.pigTexture = new Texture(Gdx.files.internal(texturePath));
-        this.health = health;
+    public Pig(World world, String texture_path, Vector2 position) {
+        this.pig_texture = new Texture(Gdx.files.internal(texture_path));
+        this.initial_position = position;
 
-        // Create body definition
-        BodyDef bodyDef = new BodyDef();
-        // bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(position);
+        // Creating pig body definition
+        BodyDef pig_body_def = new BodyDef();
+        pig_body_def.type = BodyDef.BodyType.DynamicBody;
+        pig_body_def.position.set(position);
 
-        // Create body in the world
-        pigBody = world.createBody(bodyDef);
+        // creting body in the world
+        pig_body = world.createBody(pig_body_def);
 
-        // Create shape for the body
+        // creating shape for the body
         CircleShape shape = new CircleShape();
-        shape.setRadius(pigTexture.getWidth() / 2f / 100f); // Adjusted for Box2D scale
+        shape.setRadius(pig_texture.getWidth() / 2f / 100f);
 
-        // Create fixture definition
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
-        fixtureDef.friction = 0.5f;
-        fixtureDef.restitution = 0.3f;
+        // creating fixture definition
+        FixtureDef pig_fixture_def = new FixtureDef();
+        pig_fixture_def.shape = shape;
+        pig_fixture_def.density = 1f;
+        pig_fixture_def.friction = 0.5f;
+        pig_fixture_def.restitution = 0.3f;
 
         // Attach fixture to the body
-        pigBody.createFixture(fixtureDef);
+        pig_body.createFixture(pig_fixture_def);
 
-        // Dispose shape
+        // disposing the shape
         shape.dispose();
 
-        pigBody.setUserData(this);
+        pig_body.setUserData(this);
+
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
-        // // Update the actor's position to match the body's position
-        // // setPosition(pigBody.getPosition().x * 100f - pigTexture.getWidth() / 2f, pigBody.getPosition().y * 100f - pigTexture.getHeight() / 2f);
-
-        // setPosition(pigBody.getPosition().x * 100f - pigTexture.getWidth() / 2f, pigBody.getPosition().y * 100f - pigTexture.getHeight() / 2f);
-
-        setPosition(pigBody.getPosition().x * 100f - pigTexture.getWidth() / 2f, pigBody.getPosition().y * 100f - pigTexture.getHeight() / 2f);
+        setPosition(pig_body.getPosition().x * 100 - pig_texture.getWidth() / 2f,
+                pig_body.getPosition().y * 100f - pig_texture.getHeight() / 2f);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(pigTexture, getX(), getY());
+        batch.draw(pig_texture, getX(), getY());
+    }
+
+    public void dispose() {
+        pig_texture.dispose();
+    }
+
+    public Texture getTexture() {
+        return pig_texture;
+    }
+
+    public Body getBody() {
+        return pig_body;
     }
 
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health <= 0) {
-            this.remove();  // Remove the pig from the stage when health is zero
+            this.remove(); // Remove the pig from the stage when health is zero
         }
     }
 
-    public void dispose() {
-        pigTexture.dispose();
-    }
-
-    public Texture getTexture() {
-        return pigTexture;
-    }
-
-    public Body getBody() {
-        return pigBody;
-    }
-
-    public int getHealth() {
+    public int getHealth(){
         return health;
     }
+
+    // public void setPosition(Vector2 new_position) {
+    // pig_body.setTransform(new_position.x / 100f, new_position.y/100f);
+    // }
+
 }

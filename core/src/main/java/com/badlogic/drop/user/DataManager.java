@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DataManager {
-    private static final String DATA_FILE = "C:\\Users\\thera\\OneDrive\\Desktop\\2023418_2023610\\AngryBird\\core\\src\\main\\data.ser";
+    // private static final String DATA_FILE = "C:\\Users\\thera\\OneDrive\\Desktop\\2023418_2023610\\AngryBird\\core\\src\\main\\data.ser";
+    private static final String DATA_FILE = "./data.ser";
     private static DataManager instance;
     private Map<String, User> userMap;
 

@@ -50,11 +50,13 @@ public class LevelGenerator {
                     int blockY = block_height * i + min[1];
 
                     // selecting the blocktyep
-                    String block_texture_path = block_base_directory + block_types[i % block_types.length] + "/square.png";
+                    String block_texture_path = block_base_directory + block_types[i % block_types.length]
+                            + "/square.png";
                     Vector2 block_position = new Vector2(baseX, blockY);
 
                     // creating block and setting size
-                    block_struct block = new block_struct(bd, fd, lg_world, block_texture_path, block_position);
+                    // block_struct block = new block_struct(bd, fd, lg_world, block_texture_path, block_position, block_height);
+                    block_struct block = new block_struct(lg_world, block_texture_path, block_position, block_height);
 
                     block.setSize(block_height, block_height); // square blocks
                     lg_stage.addActor(block);

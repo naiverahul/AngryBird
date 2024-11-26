@@ -272,7 +272,8 @@ public class level_screen implements Screen {
             }
         });
 
-        int level = current_user.getLevel();
+        // int level = current_user.getLevel();
+        int level = 4;
         switch (level) {
             case 1:
                 l_level_button_listener(l_1_button);

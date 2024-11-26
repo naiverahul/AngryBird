@@ -20,7 +20,7 @@ public class LevelGenerator {
     private World lg_world;
 
     private final int[] min = { 1100, 150 }, max = { 1700, 400 };
-    private final int block_height = 60, max_structures = 5;
+    private final int block_height = 6, max_structures = 5;
 
     private String pigs_base = "Pigimages/pig", block_base_directory = "Structures/";
     private String[] pig_textures = { ".png", "2.png", "3.png", "4.png" }, block_types = { "wood", "stone", "glass" };

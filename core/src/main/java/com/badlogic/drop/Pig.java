@@ -38,7 +38,7 @@ public class Pig extends Actor {
         pig_fixture_def.shape = shape;
         pig_fixture_def.density = 1f;
         pig_fixture_def.friction = 0.5f;
-        pig_fixture_def.restitution = 0.3f;
+        pig_fixture_def.restitution = 0.5f;
 
         // Attach fixture to the body
         pig_body.createFixture(pig_fixture_def);

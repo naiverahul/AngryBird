@@ -9,7 +9,7 @@ import java.util.Map;
 public class DataManager {
     // private static final String DATA_FILE = "C:\\Users\\thera\\OneDrive\\Desktop\\2023418_2023610\\AngryBird\\core\\src\\main\\data.ser";
     // private static final String DATA_FILE = "./data.ser";
-    private static final String DATA_FILE = "C:\\Users\\davsv\\Dropbox\\PC (2)\\Desktop\\copy_angrybird\\AngryBird\\core\\src\\main\\java\\com\\badlogic\\drop\\user\\data.ser";
+    private static final String DATA_FILE = "C:\\Users\\thera\\OneDrive\\Desktop\\New folder\\AngryBird\\data.ser";
     private static DataManager instance;
     private Map<String, User> userMap;
 

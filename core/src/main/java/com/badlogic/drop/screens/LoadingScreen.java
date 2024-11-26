@@ -171,7 +171,7 @@ public class LoadingScreen implements Screen {
                     buttonsVisible = true;
                 }
             };
-            Timer.schedule(showButtonsTask, 1.0f);
+            Timer.schedule(showButtonsTask, 2f);
         }
 
         if (!buttonsVisible) {

@@ -98,7 +98,6 @@ public class game_screen implements Screen, Serializable {
 
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
         Table table = new Table();
-        table.debug(Table.Debug.all);
         table.setFillParent(true);
         stage.addActor(table);
 
@@ -190,7 +189,7 @@ public class game_screen implements Screen, Serializable {
                     float impulseStrength = 10f; // Adjust this value as needed
                     pig.getBody().applyLinearImpulse(impulseDirection.scl(impulseStrength), pigPosition, true);
                 }
-                
+
                 System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());
             }
 

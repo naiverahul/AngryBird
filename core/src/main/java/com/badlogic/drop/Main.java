@@ -10,43 +10,54 @@ import javax.swing.*;
 
 public class Main extends Game {
     private MyGame myGame;
-    private User currentUser=null;
+    private User currentUser = null;
 
     @Override
     public void create() {
-        // User[] currentUserHolder = new User[1];
-        // Login_and_SignUp loginAndSignUp = new Login_and_SignUp(currentUserHolder);
+        User[] currentUserHolder = new User[1];
+        Login_and_SignUp loginAndSignUp = new Login_and_SignUp(currentUserHolder);
 
-        // SwingUtilities.invokeLater(loginAndSignUp::showLoginSignupDialog);
+        // Launch login/signup dialog on the Swing thread
+        SwingUtilities.invokeLater(() -> {
+            loginAndSignUp.showLoginSignupDialog();
 
-        // // Wait for the user to complete login/signup before starting the game
-        // while (currentUserHolder[0] == null) {
-        //     try {
-        //         Thread.sleep(100); // Sleep for a short period to avoid busy-waiting
-        //     } catch (InterruptedException e) {
-        //         e.printStackTrace();
-        //     }
-        // }
+            if (currentUserHolder[0] != null) {
+                currentUser = currentUserHolder[0];
+                Gdx.app.log("Main", "Game started with user: " + currentUser.getName());
 
-        // this.currentUser = currentUserHolder[0];
-        // Gdx.app.log("Main", "Game started with user: " + currentUser.getName());
-
-        myGame = new MyGame(currentUser);
-        myGame.create();
+                // Initialize the game on the LibGDX thread
+                Gdx.app.postRunnable(() -> {
+                    myGame = new MyGame(currentUser);
+                    myGame.create();
+                });
+            } else {
+                Gdx.app.log("Main", "User did not log in. Exiting the game.");
+                Gdx.app.exit();
+            }
+        });
     }
 
     @Override
     public void render() {
-        myGame.render();
-    }
-
-    @Override
-    public void dispose() {
-        myGame.dispose();
+        // Render only if the game has been initialized
+        if (myGame != null) {
+            myGame.render();
+        }
     }
 
     @Override
     public void resize(int width, int height) {
-        myGame.resize(width, height);
+        // Resize only if the game has been initialized
+        if (myGame != null) {
+            myGame.resize(width, height);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        // Dispose resources only if the game has been initialized
+        if (myGame != null) {
+            myGame.dispose();
+        }
     }
 }

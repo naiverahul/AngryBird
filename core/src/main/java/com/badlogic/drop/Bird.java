@@ -1,5 +1,9 @@
 package com.badlogic.drop;
 
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.Random;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -19,6 +23,28 @@ public class Bird extends Actor {
     private Vector2 initialPosition;
     private boolean isDragging;
     private Vector2 dragStart;
+    private Random random = new Random();
+    private int damage = 1 + random.nextInt(10);
+    private int health = 0;
+    private boolean destry=false;
+    private FixtureDef fixtureDef;
+
+    public int getDamage() {
+        return damage;
+    }
+    public int getHealth(){
+        return health;
+    }
+
+    public boolean destroy(){
+        
+        return this.destry;
+    }
+    public void setdestroy(Queue <Body> bodiestodestroy,ArrayList <Bird> birds,int current_bird_index){
+        birds.remove(current_bird_index);
+        bodiestodestroy.add(birdBody);
+        this.destry = true;
+    }
 
     public Bird(World world, String texturePath, Vector2 position) {
         this.birdTexture = new Texture(Gdx.files.internal(texturePath));
@@ -35,10 +61,10 @@ public class Bird extends Actor {
 
         // Create shape for the body
         CircleShape shape = new CircleShape();
-        shape.setRadius(birdTexture.getWidth() / 2f / 100f); // Adjusted for Box2D scale
+        shape.setRadius(birdTexture.getWidth() / 10f); // Adjusted for Box2D scale
 
         // Create fixture definition
-        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;
@@ -66,7 +92,7 @@ public class Bird extends Actor {
                     Vector2 dragEnd = new Vector2(x, y);
                     Vector2 dragVector = dragStart.cpy().sub(dragEnd);
                     birdBody.setTransform(initialPosition.cpy().sub(dragVector.scl(0.1f)), birdBody.getAngle());
-                    isDragging=false;
+                    isDragging = false;
                 }
             }
 
@@ -90,7 +116,8 @@ public class Bird extends Actor {
     public void act(float delta) {
         super.act(delta);
         // Update the actor's position to match the body's position
-        setPosition(birdBody.getPosition().x * 100f - birdTexture.getWidth() / 2f, birdBody.getPosition().y * 100f - birdTexture.getHeight() / 2f);
+        setPosition(birdBody.getPosition().x * 100f - birdTexture.getWidth() / 2f,
+                birdBody.getPosition().y * 100f - birdTexture.getHeight() / 2f);
     }
 
     @Override

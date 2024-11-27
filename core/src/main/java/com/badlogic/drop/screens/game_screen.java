@@ -111,7 +111,7 @@ public class game_screen implements Screen, Serializable {
     private void make_ground() {
         System.out.println("Making ground");
         this.body_def.type = BodyDef.BodyType.StaticBody;
-        this.body_def.position.set(0, 0);
+        this.body_def.position.set(0, 120);
 
         ChainShape groundShape = new ChainShape();
         groundShape.createChain(new Vector2[] { new Vector2(-50000000, 0), new Vector2(50000000, 0) });
@@ -154,8 +154,8 @@ public class game_screen implements Screen, Serializable {
             for (int i = 0; i < structure_height; i++) {
                 Vector2 block_position = new Vector2(baseX, min[1] + i * block_height);
                 structure.add(
-                        new block_struct(world, block_base_directory + block_types[random.nextInt(3)] + "/square.png",
-                                block_position, block_height));
+                    new block_struct(world, block_base_directory + block_types[random.nextInt(3)] + "/square.png",
+                        block_position, block_height));
                 block_positions.add(block_position);
             }
             block_list.add(structure);
@@ -178,16 +178,55 @@ public class game_screen implements Screen, Serializable {
 
                 // Check if a bird collided with a pig
                 if ((a.getBody().getUserData() instanceof Bird && b.getBody().getUserData() instanceof Pig) ||
-                        (a.getBody().getUserData() instanceof Pig && b.getBody().getUserData() instanceof Bird)) {
+                    (a.getBody().getUserData() instanceof Pig && b.getBody().getUserData() instanceof Bird)) {
                     Pig pig = (a.getBody().getUserData() instanceof Pig) ? (Pig) a.getBody().getUserData()
-                            : (Pig) b.getBody().getUserData();
-                    pig.takeDamage(50); // Example damage value
+                        : (Pig) b.getBody().getUserData();
+                    // pig.takeDamage(10); // Example damage value
+
+                    Bird bird = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
+                    pig.takeDamage(bird.getDamage());
                     // Apply an impulse to the pig to make it move away
                     Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
                     Vector2 pigPosition = pig.getBody().getPosition();
                     Vector2 impulseDirection = pigPosition.cpy().sub(collisionPoint).nor();
                     float impulseStrength = 10f; // Adjust this value as needed
                     pig.getBody().applyLinearImpulse(impulseDirection.scl(impulseStrength), pigPosition, true);
+                }
+
+                else if ((a.getBody().getUserData() instanceof Bird
+                    && b.getBody().getUserData() instanceof block_struct)
+                    || (b.getBody().getUserData() instanceof Bird
+                    && a.getBody().getUserData() instanceof block_struct)) {
+                    block_struct block = (block_struct) ((a.getBody().getUserData() instanceof block_struct) ? a : b)
+                        .getBody().getUserData();
+                    // block.takeDamage(10);
+
+                    Bird bird = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
+                    block.takeDamage(bird.getDamage());
+
+                    Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
+                    Vector2 blockPosition = block.getBody().getPosition();
+                    Vector2 impulseDirection = blockPosition.cpy().sub(collisionPoint).nor();
+                    float impulseForce = 10000000f;
+                    block.getBody().applyLinearImpulse(impulseDirection.scl(impulseForce), blockPosition, true);
+                } else if (((a.getBody().getUserData() instanceof Pig) && (b.getBody().getUserData() instanceof Pig)) ||
+                    ((a.getBody().getUserData() instanceof Bird) && (b.getBody().getUserData() instanceof Bird))
+                    || ((a.getBody().getUserData() instanceof block_struct)
+                    && (b.getBody().getUserData() instanceof block_struct))) {
+                    System.out.println("same body collision.");
+                } else {
+                    // if ((a.getBody().getUserData() instanceof Pig) || (b.getBody().getUserData() instanceof Pig)) {
+                    //     Pig o = (Pig) ((a.getBody().getUserData() instanceof Pig) ? a : b).getBody().getUserData();
+                    //     o.dispose();
+                    // } else if ((a.getBody().getUserData() instanceof Bird)
+                    //         || (b.getBody().getUserData() instanceof Bird)) {
+                    //     Bird o = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
+                    //     o.dispose();
+                    // } else {
+                    //     block_struct o = (block_struct) ((a.getBody().getUserData() instanceof block_struct) ? a : b)
+                    //             .getBody().getUserData();
+                    //     o.dispose();
+                    // }
                 }
 
                 System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());
@@ -311,7 +350,7 @@ public class game_screen implements Screen, Serializable {
                     Vector2 impulse = calculateImpulse(drastart, draend);
                     current_bird.getBody().setAwake(true); // Wake up the body
                     current_bird.getBody().applyLinearImpulse(impulse,
-                            current_bird.getBody().getWorldCenter(), true);
+                        current_bird.getBody().getWorldCenter(), true);
                 }
                 return true;
             }
@@ -340,7 +379,7 @@ public class game_screen implements Screen, Serializable {
             float birdWidth = current_bird.getTexture().getWidth() * 0.25f;
             float birdHeight = current_bird.getTexture().getHeight() * 0.25f;
             stage.getBatch().draw(current_bird.getTexture(), birdPosition.x, birdPosition.y, birdWidth,
-                    birdHeight);
+                birdHeight);
         }
 
         // draw the defense structure here
@@ -349,16 +388,21 @@ public class game_screen implements Screen, Serializable {
             for (block_struct block : block_list.get(structure_count)) {
                 Vector2 block_position = block_position_list.get(structure_count).get(i);
                 // block.setPosition(block_position.x, block_position.y);
-                // stage.getBatch().draw(block.getTexture(), block_position.x, block_position.y, block.getWidth()*0.25f, block.getHeight()*0.25f);
-                stage.getBatch().draw(block.getTexture(), block.getBody().getPosition().x, block.getBody().getPosition().y, block.getTexture().getWidth()*0.5f, block.getTexture().getHeight()*0.5f);
+                // stage.getBatch().draw(block.getTexture(), block_position.x, block_position.y,
+                // block.getWidth()*0.25f, block.getHeight()*0.25f);
+                stage.getBatch().draw(block.getTexture(), block.getBody().getPosition().x,
+                    block.getBody().getPosition().y, block.getTexture().getWidth() * 0.5f,
+                    block.getTexture().getHeight() * 0.5f);
                 i++;
             }
             Vector2 pig_position = pig_positions.get(structure_count);
             Pig pig = pig_list.get(structure_count);
             // pig_list.get(structure_count).setPosition(pig_positions.get(structure_count).x,
-                    // pig_positions.get(structure_count).y);
-            // stage.getBatch().draw(pig.getTexture(), pig_position.x, pig_position.y, pig.getWidth()*0.25f, pig.getHeight()*0.25f);
-            stage.getBatch().draw(pig.getTexture(), pig.getBody().getPosition().x, pig.getBody().getPosition().y, pig.getTexture().getWidth()*0.15f, pig.getTexture().getHeight()*0.15f);
+            // pig_positions.get(structure_count).y);
+            // stage.getBatch().draw(pig.getTexture(), pig_position.x, pig_position.y,
+            // pig.getWidth()*0.25f, pig.getHeight()*0.25f);
+            stage.getBatch().draw(pig.getTexture(), pig.getBody().getPosition().x, pig.getBody().getPosition().y,
+                pig.getTexture().getWidth() * 0.15f, pig.getTexture().getHeight() * 0.15f);
         }
 
         stage.getBatch().end();

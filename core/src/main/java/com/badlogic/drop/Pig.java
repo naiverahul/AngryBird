@@ -31,7 +31,7 @@ public class Pig extends Actor {
 
         // creating shape for the body
         CircleShape shape = new CircleShape();
-        shape.setRadius(pig_texture.getWidth() / 2f / 100f);
+        shape.setRadius(pig_texture.getWidth() / 20f);
 
         // creating fixture definition
         FixtureDef pig_fixture_def = new FixtureDef();
@@ -54,7 +54,7 @@ public class Pig extends Actor {
     public void act(float delta) {
         super.act(delta);
         setPosition(pig_body.getPosition().x * 100 - pig_texture.getWidth() / 2f,
-                pig_body.getPosition().y * 100f - pig_texture.getHeight() / 2f);
+            pig_body.getPosition().y * 100f - pig_texture.getHeight() / 2f);
     }
 
     @Override

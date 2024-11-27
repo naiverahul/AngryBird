@@ -62,6 +62,7 @@ public class level_screen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 game.clicksound.play();
                 game.setScreen(game.loadingScreen);
+                dispose();
             }
         });
 

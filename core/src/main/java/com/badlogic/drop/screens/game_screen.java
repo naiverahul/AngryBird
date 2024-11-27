@@ -181,13 +181,27 @@ public class game_screen implements Screen, Serializable {
                         (a.getBody().getUserData() instanceof Pig && b.getBody().getUserData() instanceof Bird)) {
                     Pig pig = (a.getBody().getUserData() instanceof Pig) ? (Pig) a.getBody().getUserData()
                             : (Pig) b.getBody().getUserData();
-                    pig.takeDamage(50); // Example damage value
+                    pig.takeDamage(10); // Example damage value
                     // Apply an impulse to the pig to make it move away
                     Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
                     Vector2 pigPosition = pig.getBody().getPosition();
                     Vector2 impulseDirection = pigPosition.cpy().sub(collisionPoint).nor();
                     float impulseStrength = 10f; // Adjust this value as needed
                     pig.getBody().applyLinearImpulse(impulseDirection.scl(impulseStrength), pigPosition, true);
+                }
+
+                else if ((a.getBody().getUserData() instanceof Bird
+                        && b.getBody().getUserData() instanceof block_struct)
+                        || (b.getBody().getUserData() instanceof Bird
+                                && a.getBody().getUserData() instanceof block_struct)) {
+                    block_struct block = (block_struct) ((a.getBody().getUserData() instanceof block_struct) ? a : b)
+                            .getBody().getUserData();
+                    block.takeDamage(10);
+                    Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
+                    Vector2 blockPosition = block.getBody().getPosition();
+                    Vector2 impulseDirection = blockPosition.cpy().sub(collisionPoint).nor();
+                    float impulseForce = 10000000f;
+                    block.getBody().applyLinearImpulse(impulseDirection.scl(impulseForce), blockPosition, true);
                 }
 
                 System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());
@@ -349,16 +363,21 @@ public class game_screen implements Screen, Serializable {
             for (block_struct block : block_list.get(structure_count)) {
                 Vector2 block_position = block_position_list.get(structure_count).get(i);
                 // block.setPosition(block_position.x, block_position.y);
-                // stage.getBatch().draw(block.getTexture(), block_position.x, block_position.y, block.getWidth()*0.25f, block.getHeight()*0.25f);
-                stage.getBatch().draw(block.getTexture(), block.getBody().getPosition().x, block.getBody().getPosition().y, block.getTexture().getWidth()*0.5f, block.getTexture().getHeight()*0.5f);
+                // stage.getBatch().draw(block.getTexture(), block_position.x, block_position.y,
+                // block.getWidth()*0.25f, block.getHeight()*0.25f);
+                stage.getBatch().draw(block.getTexture(), block.getBody().getPosition().x,
+                        block.getBody().getPosition().y, block.getTexture().getWidth() * 0.5f,
+                        block.getTexture().getHeight() * 0.5f);
                 i++;
             }
             Vector2 pig_position = pig_positions.get(structure_count);
             Pig pig = pig_list.get(structure_count);
             // pig_list.get(structure_count).setPosition(pig_positions.get(structure_count).x,
-                    // pig_positions.get(structure_count).y);
-            // stage.getBatch().draw(pig.getTexture(), pig_position.x, pig_position.y, pig.getWidth()*0.25f, pig.getHeight()*0.25f);
-            stage.getBatch().draw(pig.getTexture(), pig.getBody().getPosition().x, pig.getBody().getPosition().y, pig.getTexture().getWidth()*0.15f, pig.getTexture().getHeight()*0.15f);
+            // pig_positions.get(structure_count).y);
+            // stage.getBatch().draw(pig.getTexture(), pig_position.x, pig_position.y,
+            // pig.getWidth()*0.25f, pig.getHeight()*0.25f);
+            stage.getBatch().draw(pig.getTexture(), pig.getBody().getPosition().x, pig.getBody().getPosition().y,
+                    pig.getTexture().getWidth() * 0.15f, pig.getTexture().getHeight() * 0.15f);
         }
 
         stage.getBatch().end();

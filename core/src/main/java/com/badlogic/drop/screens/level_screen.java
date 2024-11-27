@@ -90,7 +90,8 @@ public class level_screen implements Screen {
     }
 
     private void configureLevelButtons() {
-        int level = current_user.getLevel(); // Get the user's unlocked level
+        // int level = current_user.getLevel(); // Get the user's unlocked level
+        int level = 4;
         ImageButton[] levelButtons = {l_1_button, l_2_button, l_3_button, l_4_button};
 
         for (int i = 0; i < levelButtons.length; i++) {

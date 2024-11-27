@@ -14,27 +14,31 @@ public class Main extends Game {
 
     @Override
     public void create() {
-        User[] currentUserHolder = new User[1];
-        Login_and_SignUp loginAndSignUp = new Login_and_SignUp(currentUserHolder);
+        // User[] currentUserHolder = new User[1];
+        // Login_and_SignUp loginAndSignUp = new Login_and_SignUp(currentUserHolder);
 
-        // Launch login/signup dialog on the Swing thread
-        SwingUtilities.invokeLater(() -> {
-            loginAndSignUp.showLoginSignupDialog();
+        // // Launch login/signup dialog on the Swing thread
+        // SwingUtilities.invokeLater(() -> {
+        //     loginAndSignUp.showLoginSignupDialog();
 
-            if (currentUserHolder[0] != null) {
-                currentUser = currentUserHolder[0];
-                Gdx.app.log("Main", "Game started with user: " + currentUser.getName());
+        //     if (currentUserHolder[0] != null) {
+        //         currentUser = currentUserHolder[0];
+        //         Gdx.app.log("Main", "Game started with user: " + currentUser.getName());
 
-                // Initialize the game on the LibGDX thread
-                Gdx.app.postRunnable(() -> {
-                    myGame = new MyGame(currentUser);
-                    myGame.create();
-                });
-            } else {
-                Gdx.app.log("Main", "User did not log in. Exiting the game.");
-                Gdx.app.exit();
-            }
-        });
+        //         // Initialize the game on the LibGDX thread
+        //         Gdx.app.postRunnable(() -> {
+        //             myGame = new MyGame(currentUser);
+        //             myGame.create();
+        //         });
+        //     } else {
+        //         Gdx.app.log("Main", "User did not log in. Exiting the game.");
+        //         Gdx.app.exit();
+        //     }
+        // });
+
+        myGame = new MyGame(null);
+        myGame.create();
+
     }
 
     @Override

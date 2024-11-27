@@ -40,6 +40,7 @@ public class LoadingScreen implements Screen {
     private boolean buttonsVisible = false;
     private Timer.Task showButtonsTask;
     private static final float VIRTUAL_HEIGHT = 600;
+//    private ImageButton loadButton;
 
     public LoadingScreen(MyGame game, AssetManager assetManager) {
         this.game = game;
@@ -49,6 +50,9 @@ public class LoadingScreen implements Screen {
         loadingTexture = new Texture(Gdx.files.internal("loading.png"));
         Texture startButtonTexture = new Texture(Gdx.files.internal("start.png"));
         Texture exitButtonTexture = new Texture(Gdx.files.internal("exit.png"));
+//        Texture loadButtonTexture = new Texture(Gdx.files.internal("load.png"));
+//        loadButton = new ImageButton(new TextureRegionDrawable(loadButtonTexture));
+//        loadButton.setVisible(false);
         startButton = new ImageButton(new TextureRegionDrawable(startButtonTexture));
         exitButton = new ImageButton(new TextureRegionDrawable(exitButtonTexture));
         startButton.setVisible(false);
@@ -102,6 +106,9 @@ public class LoadingScreen implements Screen {
         stage.addActor(nameLabel);
         stage.addActor(startButton);
         stage.addActor(exitButton);
+//        loadButton.setSize(250f, 140f);
+//        loadButton.setPosition(835f, viewport.getWorldHeight() / 18f + 160f); // Adjust position as needed
+//        stage.addActor(loadButton);
     }
 
     private void addInputListeners() {
@@ -119,6 +126,14 @@ public class LoadingScreen implements Screen {
                 Gdx.app.exit();
             }
         });
+//        loadButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                game_screen loadedGameScreen = game_screen.loadGameState(game);
+//                game.setScreen(loadedGameScreen);
+//            }
+//        });
+
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
@@ -168,6 +183,7 @@ public class LoadingScreen implements Screen {
                     progressBar.setVisible(false);
                     startButton.setVisible(true);
                     exitButton.setVisible(true);
+//                    loadButton.setVisible(true);
                     buttonsVisible = true;
                 }
             };

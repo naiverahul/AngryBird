@@ -1,5 +1,8 @@
 package com.badlogic.drop;
 
+import java.util.PrimitiveIterator;
+import java.util.Queue;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
@@ -17,6 +20,7 @@ public class block_struct extends Actor {
     private Body block_body;
     private Vector2 initial_position;
     private int health = 10;
+    private boolean destry= false;
 
     // public block_struct(BodyDef bd, FixtureDef fd, World lg_world, String
     // block_texture_path, Vector2 block_position, int size) {
@@ -58,7 +62,12 @@ public class block_struct extends Actor {
 
     // @Override
     // public void draw(){}
-
+    public boolean destroy(){
+        return this.destry;
+    }
+    public void setdestroy(){
+        this.destry = true;
+    }
     public void takeDamage(int damage) {
         this.health -= damage;
         if (this.health <= 0) {

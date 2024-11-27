@@ -1,7 +1,9 @@
 package com.badlogic.drop.screens;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import com.badlogic.drop.Bird;
@@ -28,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+// import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -55,6 +58,7 @@ public class game_screen implements Screen, Serializable {
     private int current_bird_index = 0;
     private Vector2 initial_bird_position, drastart, draend;
     private boolean is_dragging = false;
+    private Queue<Body> bodiesToDestroy;
 
     // defense structure drawing region
     private final int[] min = { 1100, 150 }, max = { 1700, 400 };
@@ -82,9 +86,26 @@ public class game_screen implements Screen, Serializable {
         this.birds = new ArrayList<Bird>();
         this.deburenderer = new Box2DDebugRenderer();
         this.level_generator = new LevelGenerator(ori_game_variable, world, stage);
+        this.bodiesToDestroy = new LinkedList<>();
 
         create_ui();
         create_contact_listener();
+    }
+    public void saveGameState() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("game_state.ser"))) {
+            oos.writeObject(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static game_screen loadGameState(MyGame game) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("game_state.ser"))) {
+            return (game_screen) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return new game_screen(game); // Return a new game_screen if loading fails
+        }
     }
 
     private void create_ui() {
@@ -124,13 +145,24 @@ public class game_screen implements Screen, Serializable {
         groundShape.dispose();
     }
 
+    private boolean pigs_destroyed() {
+        boolean status = true;
+        for (Pig pig : pig_list) {
+            status = status && pig.destroy();
+            if (!status) {
+                break;
+            }
+        }
+        return status;
+    }
+
     private void initialize_birds() {
         initial_bird_position = new Vector2(13000, 22000);
 
-        birds.add(new Bird(world, "Birdimages/bigbird.png", initial_bird_position));
-        birds.add(new Bird(world, "Birdimages/redbird.png", initial_bird_position));
-        birds.add(new Bird(world, "Birdimages/yellowbird.png", initial_bird_position));
-        birds.add(new Bird(world, "Birdimages/blackbird.png", initial_bird_position));
+        birds.add(new Bird(world, "Birdimages/bigbird.png", initial_bird_position,120));
+        birds.add(new Bird(world, "Birdimages/redbird.png", initial_bird_position,100));
+        birds.add(new Bird(world, "Birdimages/yellowbird.png", initial_bird_position,90));
+        birds.add(new Bird(world, "Birdimages/blackbird.png", initial_bird_position,60));
 
         current_bird = birds.get(current_bird_index);
         current_bird.setPosition(initial_bird_position);
@@ -184,7 +216,16 @@ public class game_screen implements Screen, Serializable {
                     // pig.takeDamage(10); // Example damage value
 
                     Bird bird = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
-                    pig.takeDamage(bird.getDamage());
+                    if(bird.birdhealth>0) {
+                        bird.birdhealth -= 50;
+                    }else{
+                        bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
+                    }
+                    if(pig.pighealth>0) {
+                        pig.pighealth -= 50;
+                    }else{
+                        pig.setdestroy(bodiesToDestroy);
+                    }
                     // Apply an impulse to the pig to make it move away
                     Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
                     Vector2 pigPosition = pig.getBody().getPosition();
@@ -202,31 +243,48 @@ public class game_screen implements Screen, Serializable {
                     // block.takeDamage(10);
 
                     Bird bird = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
-                    block.takeDamage(bird.getDamage());
+                    if(bird.birdhealth>0) {
+                        bird.birdhealth -= 20;
+                    }else{
+                        bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
+                    }
 
                     Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
                     Vector2 blockPosition = block.getBody().getPosition();
                     Vector2 impulseDirection = blockPosition.cpy().sub(collisionPoint).nor();
-                    float impulseForce = 10000000f;
+                    float impulseForce = 10000f;
                     block.getBody().applyLinearImpulse(impulseDirection.scl(impulseForce), blockPosition, true);
                 } else if (((a.getBody().getUserData() instanceof Pig) && (b.getBody().getUserData() instanceof Pig)) ||
                     ((a.getBody().getUserData() instanceof Bird) && (b.getBody().getUserData() instanceof Bird))
                     || ((a.getBody().getUserData() instanceof block_struct)
-                    && (b.getBody().getUserData() instanceof block_struct))) {
+                    && (b.getBody().getUserData() instanceof block_struct))
+                    || (a.getBody().getUserData() instanceof Pig
+                    && b.getBody().getUserData() instanceof block_struct)
+                    || (b.getBody().getUserData() instanceof Pig
+                    && a.getBody().getUserData() instanceof block_struct)) {
                     System.out.println("same body collision.");
                 } else {
-                    // if ((a.getBody().getUserData() instanceof Pig) || (b.getBody().getUserData() instanceof Pig)) {
-                    //     Pig o = (Pig) ((a.getBody().getUserData() instanceof Pig) ? a : b).getBody().getUserData();
-                    //     o.dispose();
-                    // } else if ((a.getBody().getUserData() instanceof Bird)
-                    //         || (b.getBody().getUserData() instanceof Bird)) {
-                    //     Bird o = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
-                    //     o.dispose();
-                    // } else {
-                    //     block_struct o = (block_struct) ((a.getBody().getUserData() instanceof block_struct) ? a : b)
-                    //             .getBody().getUserData();
-                    //     o.dispose();
-                    // }
+                    if ((a.getBody().getUserData() instanceof Pig) || (b.getBody().getUserData() instanceof Pig)) {
+                        Pig o = (Pig) ((a.getBody().getUserData() instanceof Pig) ? a : b).getBody().getUserData();
+                        o.setdestroy(bodiesToDestroy);
+                        // o.setPosition(100000000000f, 100000000000f);
+                        // world.destroyBody(o.getBody());
+                    } else if ((a.getBody().getUserData() instanceof Bird)
+                        || (b.getBody().getUserData() instanceof Bird)) {
+                        Bird o = (Bird) ((a.getBody().getUserData() instanceof Bird) ? a : b).getBody().getUserData();
+                        o.setdestroy(bodiesToDestroy, birds, current_bird_index);
+                        // o.getTexture().dispose();
+                        // o.setPosition(100000000000f, 100000000000f);
+                        // world.destroyBody(o.getBody());
+
+                    } else {
+                        block_struct o = (block_struct) ((a.getBody().getUserData() instanceof block_struct) ? a : b)
+                            .getBody().getUserData();
+                        o.setdestroy();
+                        // o.setPosition(100000000000f, 100000000000f);
+                        // world.destroyBody(o.getBody());
+                        // o.getTexture().dispose();
+                    }
                 }
 
                 System.out.println("Collision detected between: " + a.getBody() + " and " + b.getBody());
@@ -279,13 +337,20 @@ public class game_screen implements Screen, Serializable {
     }
 
     private void change_catapult_bird() {
-        current_bird_index = (current_bird_index + 1) % (birds.size());
-        current_bird = birds.get(current_bird_index);
-        current_bird.getBody().setAwake(false);
-        while (current_bird.getBody().isAwake()) {
-            // Wait for the body to be set to sleep
-        }
-        current_bird.setPosition(initial_bird_position); // Reset to initial position
+        if(birds.size() == 0){
+            ori_game_variable.lose_screen.dispose();
+            ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
+            ori_game_variable.setScreen(ori_game_variable.lose_screen);
+        }else {
+            current_bird.setdestroy(this.bodiesToDestroy, birds, current_bird_index);
+            current_bird_index = (current_bird_index + 1) % (birds.size());
+            current_bird = birds.get(current_bird_index);
+            current_bird.getBody().setAwake(false);
+            while (current_bird.getBody().isAwake()) {
+                // Wait for the body to be set to sleep
+            }
+            current_bird.setPosition(initial_bird_position);
+        }// Reset to initial position
     }
 
     private Vector2 calculateImpulse(Vector2 start, Vector2 end) {
@@ -304,12 +369,14 @@ public class game_screen implements Screen, Serializable {
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.UP) {
+                    // current_bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
                     change_catapult_bird();
                 } else if (keycode == Input.Keys.DOWN) {
+                    // current_bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
                     current_bird_index = (current_bird_index - 1 + birds.size()) % birds.size();
                     current_bird = birds.get(current_bird_index);
                     current_bird.getBody().setAwake(false);
-                    current_bird.setPosition(initial_bird_position); // Reset to initial position
+                    current_bird.setPosition(initial_bird_position);
                 } else if (keycode == Input.Keys.ESCAPE) {
                     ori_game_variable.pause_screen.dispose();
                     ori_game_variable.pause_screen = new pause_screen(ori_game_variable);
@@ -373,13 +440,30 @@ public class game_screen implements Screen, Serializable {
         stage.getBatch().begin();
         stage.getBatch().draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
+        if (pigs_destroyed()) {
+            ori_game_variable.win_screen.dispose();
+            ori_game_variable.win_screen = new win_screen(ori_game_variable);
+            ori_game_variable.setScreen(ori_game_variable.win_screen);
+             current_user.incrementLevel();
+             System.out.println("Level incremented to: " + current_user.getLevel());
+
+        }
+
+        if (birds.size() == 0 && !pigs_destroyed()) {
+            ori_game_variable.lose_screen.dispose();
+            ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
+            ori_game_variable.setScreen(ori_game_variable.lose_screen);
+        }
+
         // Draw the current bird scaled down on the catapult
-        if (current_bird != null) {
-            Vector2 birdPosition = current_bird.getBody().getPosition();
-            float birdWidth = current_bird.getTexture().getWidth() * 0.25f;
-            float birdHeight = current_bird.getTexture().getHeight() * 0.25f;
-            stage.getBatch().draw(current_bird.getTexture(), birdPosition.x, birdPosition.y, birdWidth,
-                birdHeight);
+        if (!current_bird.destroy()) {
+            if (current_bird != null) {
+                Vector2 birdPosition = current_bird.getBody().getPosition();
+                float birdWidth = current_bird.getTexture().getWidth() * 0.25f;
+                float birdHeight = current_bird.getTexture().getHeight() * 0.25f;
+                stage.getBatch().draw(current_bird.getTexture(), birdPosition.x, birdPosition.y, birdWidth,
+                    birdHeight);
+            }
         }
 
         // draw the defense structure here
@@ -401,8 +485,10 @@ public class game_screen implements Screen, Serializable {
             // pig_positions.get(structure_count).y);
             // stage.getBatch().draw(pig.getTexture(), pig_position.x, pig_position.y,
             // pig.getWidth()*0.25f, pig.getHeight()*0.25f);
-            stage.getBatch().draw(pig.getTexture(), pig.getBody().getPosition().x, pig.getBody().getPosition().y,
-                pig.getTexture().getWidth() * 0.15f, pig.getTexture().getHeight() * 0.15f);
+            if (!pig.destroy()) {
+                stage.getBatch().draw(pig.getTexture(), pig.getBody().getPosition().x, pig.getBody().getPosition().y,
+                    pig.getTexture().getWidth() * 0.15f, pig.getTexture().getHeight() * 0.15f);
+            }
         }
 
         stage.getBatch().end();
@@ -420,7 +506,12 @@ public class game_screen implements Screen, Serializable {
             shape_renderer.line(drastart.x, drastart.y, draend.x, draend.y);
             shape_renderer.end();
         }
-
+        while (!bodiesToDestroy.isEmpty()) {
+            Body body = bodiesToDestroy.poll();
+            if (body != null) {
+                world.destroyBody(body);
+            }
+        }
         // Stage needs to act and draw UI elements
         stage.act(delta);
         stage.draw();
@@ -446,6 +537,7 @@ public class game_screen implements Screen, Serializable {
 
     @Override
     public void hide() {
+
     }
 
     @Override
@@ -453,6 +545,7 @@ public class game_screen implements Screen, Serializable {
         background.dispose();
         stage.dispose();
         world.dispose();
+
     }
 
 }

@@ -1,5 +1,7 @@
 package com.badlogic.drop;
 
+import java.util.ArrayList;
+import java.util.Queue;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
@@ -24,6 +26,9 @@ public class Bird extends Actor {
     private Random random = new Random();
     private int damage = 1 + random.nextInt(10);
     private int health = 0;
+    private boolean destry=false;
+    private FixtureDef fixtureDef;
+    public int birdhealth;
 
     public int getDamage() {
         return damage;
@@ -31,11 +36,24 @@ public class Bird extends Actor {
     public int getHealth(){
         return health;
     }
-    public Bird(World world, String texturePath, Vector2 position) {
+
+    public boolean destroy(){
+
+        return this.destry;
+    }
+    public void setdestroy(Queue <Body> bodiestodestroy,ArrayList <Bird> birds,int current_bird_index){
+        if(current_bird_index<birds.size()) {
+            birds.remove(current_bird_index);
+        }
+        bodiestodestroy.add(birdBody);
+        this.destry = true;
+    }
+
+    public Bird(World world, String texturePath, Vector2 position, int birdhealth) {
         this.birdTexture = new Texture(Gdx.files.internal(texturePath));
         this.initialPosition = position;
         this.isDragging = false;
-
+        this.birdhealth = birdhealth;
         // Create body definition
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -49,7 +67,7 @@ public class Bird extends Actor {
         shape.setRadius(birdTexture.getWidth() / 10f); // Adjusted for Box2D scale
 
         // Create fixture definition
-        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 1f;
         fixtureDef.friction = 0.5f;

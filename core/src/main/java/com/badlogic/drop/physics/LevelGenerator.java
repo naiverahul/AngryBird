@@ -51,7 +51,7 @@ public class LevelGenerator {
 
                     // selecting the blocktyep
                     String block_texture_path = block_base_directory + block_types[i % block_types.length]
-                            + "/square.png";
+                        + "/square.png";
                     Vector2 block_position = new Vector2(baseX, blockY);
 
                     // creating block and setting size
@@ -67,7 +67,7 @@ public class LevelGenerator {
             {
                 int pigY = min[1] + (structure_height * block_height);
                 Pig pig = new Pig(lg_world, pigs_base + pig_textures[structure_count % pig_textures.length],
-                        new Vector2(baseX, pigY));
+                    new Vector2(baseX, pigY));
                 lg_stage.addActor(pig);
             }
         }

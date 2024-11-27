@@ -1,5 +1,7 @@
 package com.badlogic.drop.user;
 
+import com.badlogic.drop.MyGame;
+
 import javax.swing.*;
 
 public class Login_and_SignUp {
@@ -70,7 +72,7 @@ public class Login_and_SignUp {
             loginAttempts = 0;
             JOptionPane.showMessageDialog(
                 null,
-                "Login successful! Welcome back, " + name + ". Current Level: " + dataManager.getUser(name).getLevel(),
+                "Login successful! Welcome back, " + name + ". Current Level: " + dataManager.getUser(name).getLevel() + ". Score: " + dataManager.getUser(name).getScore(),
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE
             );
@@ -112,7 +114,7 @@ public class Login_and_SignUp {
             dataManager.addUser(name);
             JOptionPane.showMessageDialog(
                 null,
-                "Signup successful! Welcome, " + name + ". Current Level: 1",
+                "Signup successful! Welcome, " + name + ". Current Level: 1" + ". Score: 0",
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE
             );

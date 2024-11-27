@@ -1,5 +1,7 @@
 package com.badlogic.drop;
 
+import java.util.Queue;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -16,11 +18,13 @@ public class Pig extends Actor {
     private Body pig_body;
     private Vector2 initial_position;
     private int health = 10;
-
+    private boolean destry;
+    public int pighealth;
     public Pig(World world, String texture_path, Vector2 position) {
         this.pig_texture = new Texture(Gdx.files.internal(texture_path));
         this.initial_position = position;
-
+        this.destry = false;
+        this.pighealth = 100;
         // Creating pig body definition
         BodyDef pig_body_def = new BodyDef();
         pig_body_def.type = BodyDef.BodyType.DynamicBody;
@@ -59,7 +63,9 @@ public class Pig extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(pig_texture, getX(), getY());
+        if(!destry){
+            batch.draw(pig_texture, getX(), getY());
+        }
     }
 
     public void dispose() {
@@ -85,6 +91,13 @@ public class Pig extends Actor {
         return health;
     }
 
+    public boolean destroy(){
+        return this.destry;
+    }
+    public void setdestroy(Queue <Body> bodiestoDestroy){
+        bodiestoDestroy.add(pig_body);
+        this.destry = true;
+    }
     // public void setPosition(Vector2 new_position) {
     // pig_body.setTransform(new_position.x / 100f, new_position.y/100f);
     // }

@@ -129,6 +129,17 @@ public class game_screen implements Screen, Serializable {
         groundShape.dispose();
     }
 
+    private boolean pigs_destroyed() {
+        boolean status = true;
+        for (Pig pig : pig_list) {
+            status = status && pig.destroy(bodiesToDestroy);
+            if (!status) {
+                break;
+            }
+        }
+        return status;
+    }
+
     private void initialize_birds() {
         initial_bird_position = new Vector2(13000, 22000);
 
@@ -212,7 +223,7 @@ public class game_screen implements Screen, Serializable {
                     Vector2 collisionPoint = contact.getWorldManifold().getPoints()[0];
                     Vector2 blockPosition = block.getBody().getPosition();
                     Vector2 impulseDirection = blockPosition.cpy().sub(collisionPoint).nor();
-                    float impulseForce = 10000000f;
+                    float impulseForce = 10000f;
                     block.getBody().applyLinearImpulse(impulseDirection.scl(impulseForce), blockPosition, true);
                 } else if (((a.getBody().getUserData() instanceof Pig) && (b.getBody().getUserData() instanceof Pig)) ||
                         ((a.getBody().getUserData() instanceof Bird) && (b.getBody().getUserData() instanceof Bird))
@@ -394,7 +405,16 @@ public class game_screen implements Screen, Serializable {
         stage.getBatch().begin();
         stage.getBatch().draw(background, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
 
-        if (birds.size() == 0) {
+        if (pigs_destroyed()) {
+            ori_game_variable.win_screen.dispose();
+            ori_game_variable.win_screen = new win_screen(ori_game_variable);
+            ori_game_variable.setScreen(ori_game_variable.win_screen);
+            // current_user.incrementLevel();
+            // System.out.println("Level incremented to: " + current_user.getLevel());
+            
+        }
+    
+        if (birds.size() == 0 && !pigs_destroyed()) {
             ori_game_variable.lose_screen.dispose();
             ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
             ori_game_variable.setScreen(ori_game_variable.lose_screen);

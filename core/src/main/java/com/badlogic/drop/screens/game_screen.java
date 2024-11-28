@@ -342,7 +342,7 @@ public class game_screen implements Screen, Serializable {
             ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
             ori_game_variable.setScreen(ori_game_variable.lose_screen);
         }else {
-            current_bird.setdestroy(this.bodiesToDestroy, birds, current_bird_index);
+            // current_bird.setdestroy(this.bodiesToDestroy, birds, current_bird_index);
             current_bird_index = (current_bird_index + 1) % (birds.size());
             current_bird = birds.get(current_bird_index);
             current_bird.getBody().setAwake(false);
@@ -371,12 +371,12 @@ public class game_screen implements Screen, Serializable {
                 if (keycode == Input.Keys.UP) {
                     // current_bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
                     change_catapult_bird();
-                } else if (keycode == Input.Keys.DOWN) {
-                    // current_bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
-                    current_bird_index = (current_bird_index - 1 + birds.size()) % birds.size();
-                    current_bird = birds.get(current_bird_index);
-                    current_bird.getBody().setAwake(false);
-                    current_bird.setPosition(initial_bird_position);
+                // } else if (keycode == Input.Keys.DOWN) {
+                //     // current_bird.setdestroy(bodiesToDestroy, birds, current_bird_index);
+                //     current_bird_index = (current_bird_index - 1 + birds.size()) % birds.size();
+                //     current_bird = birds.get(current_bird_index);
+                //     current_bird.getBody().setAwake(false);
+                //     current_bird.setPosition(initial_bird_position);
                 } else if (keycode == Input.Keys.ESCAPE) {
                     ori_game_variable.pause_screen.dispose();
                     ori_game_variable.pause_screen = new pause_screen(ori_game_variable);

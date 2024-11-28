@@ -70,7 +70,6 @@ public class game_screen implements Screen, Serializable {
     private String[] pig_textures = { ".png", "2.png", "3.png", "4.png" }, block_types = { "wood", "stone", "glass" };
     private ArrayList<Pig> pig_list = new ArrayList<Pig>();
     private ArrayList<ArrayList<block_struct>> block_list = new ArrayList<ArrayList<block_struct>>();
-    
 
     // Save these in the ser file when exit.
     private ArrayList<ArrayList<Vector2>> block_position_list = new ArrayList<ArrayList<Vector2>>();
@@ -82,9 +81,8 @@ public class game_screen implements Screen, Serializable {
         this.ori_game_variable = game;
         this.current_user = game.current_user;
 
-        // load the 4 Array lists from the ser file and fill them up. other things should work fine.
-
-
+        // load the 4 Array lists from the ser file and fill them up. other things
+        // should work fine.
 
         this.viewport = new FitViewport(1920, 1080);
         this.stage = new Stage(viewport);
@@ -181,17 +179,19 @@ public class game_screen implements Screen, Serializable {
     }
 
     private void initialize_defense_structure() {
-        if (pig_textures_used.size() !=0 && block_type_list.size() != 0) {
+        if (pig_textures_used.size() != 0 && block_type_list.size() != 0) {
             num_structures = pig_textures_used.size();
             for (int structure_count = 0; structure_count < num_structures; structure_count++) {
                 int num_blocks = block_type_list.get(structure_count).size();
                 ArrayList<block_struct> structure = new ArrayList<block_struct>();
-                for (int i = 0; i< num_blocks; i++) {
+                for (int i = 0; i < num_blocks; i++) {
                     int type = block_type_list.get(structure_count).get(i);
-                    structure.add(new block_struct(world, block_base_directory + block_types[type] + "/sqaure.png", block_position_list.get(structure_count).get(i), block_height));
+                    structure.add(new block_struct(world, block_base_directory + block_types[type] + "/sqaure.png",
+                            block_position_list.get(structure_count).get(i), block_height));
                 }
-                
-                pig_list.add(new Pig(world, pigs_base + pig_textures[pig_textures_used.get(structure_count)], pig_positions.get(structure_count)));
+
+                pig_list.add(new Pig(world, pigs_base + pig_textures[pig_textures_used.get(structure_count)],
+                        pig_positions.get(structure_count)));
             }
         } else {
             num_structures = random.nextInt(max_structures) + 1;
@@ -370,6 +370,9 @@ public class game_screen implements Screen, Serializable {
                 ori_game_variable.clicksound.play();
                 ori_game_variable.win_screen.dispose();
                 ori_game_variable.win_screen = new win_screen(ori_game_variable);
+
+                // save the 4 array list here as well.
+
                 ori_game_variable.setScreen(ori_game_variable.win_screen);
                 current_user.incrementLevel();
                 System.out.println("Level incremented to: " + current_user.getLevel());
@@ -381,6 +384,9 @@ public class game_screen implements Screen, Serializable {
                 ori_game_variable.clicksound.play();
                 ori_game_variable.lose_screen.dispose();
                 ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
+
+                // save the 4 array list here as well.
+
                 ori_game_variable.setScreen(ori_game_variable.lose_screen);
             }
         });
@@ -393,6 +399,9 @@ public class game_screen implements Screen, Serializable {
         if (birds.size() == 0) {
             ori_game_variable.lose_screen.dispose();
             ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
+
+            // save the 4 array list here as well.
+
             ori_game_variable.setScreen(ori_game_variable.lose_screen);
         } else {
             // current_bird.setdestroy(this.bodiesToDestroy, birds, current_bird_index);
@@ -433,6 +442,9 @@ public class game_screen implements Screen, Serializable {
                 } else if (keycode == Input.Keys.ESCAPE) {
                     ori_game_variable.pause_screen.dispose();
                     ori_game_variable.pause_screen = new pause_screen(ori_game_variable);
+
+                    // save the 4 array list here as well.
+
                     ori_game_variable.setScreen(ori_game_variable.pause_screen);
                 } else if (keycode == Input.Keys.BACKSPACE) {
                     ori_game_variable.level_screen.dispose();
@@ -496,6 +508,9 @@ public class game_screen implements Screen, Serializable {
         if (pigs_destroyed()) {
             ori_game_variable.win_screen.dispose();
             ori_game_variable.win_screen = new win_screen(ori_game_variable);
+
+            // save the 4 array list here as well.
+
             ori_game_variable.setScreen(ori_game_variable.win_screen);
             current_user.incrementLevel();
             System.out.println("Level incremented to: " + current_user.getLevel());
@@ -505,6 +520,9 @@ public class game_screen implements Screen, Serializable {
         if (birds.size() == 0 && !pigs_destroyed()) {
             ori_game_variable.lose_screen.dispose();
             ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
+
+            // save the 4 array list here as well.
+
             ori_game_variable.setScreen(ori_game_variable.lose_screen);
         }
 

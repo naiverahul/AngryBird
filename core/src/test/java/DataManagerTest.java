@@ -1,8 +1,7 @@
-package JUnit_tests;
-
 import com.badlogic.drop.user.DataManager;
 import com.badlogic.drop.user.User;
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataManagerTest {

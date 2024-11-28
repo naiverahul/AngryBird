@@ -1,9 +1,9 @@
-package JUnit_tests;
-
 import com.badlogic.drop.screens.game_screen;
 import com.badlogic.drop.user.User;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserTest {
 

@@ -1,5 +1,3 @@
-package JUnit_tests;
-
 import com.badlogic.drop.Bird;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -10,7 +8,8 @@ import java.util.LinkedList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BirdTest {
+public class
+BirdTest {
 
     @Test
     public void testBirdInitialization() {

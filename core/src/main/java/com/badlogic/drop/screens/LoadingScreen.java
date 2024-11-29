@@ -1,6 +1,7 @@
 package com.badlogic.drop.screens;
 
 import com.badlogic.drop.MyGame;
+import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
@@ -11,59 +12,49 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import javax.swing.JOptionPane;
+
 public class LoadingScreen implements Screen {
 
+    private static final float VIRTUAL_HEIGHT = 600;
+
+    private final MyGame game;
+    private final AssetManager assetManager;
     private Stage stage;
     private SpriteBatch batch;
     private ProgressBar progressBar;
-    private ImageButton startButton, exitButton;
+    private TextButton startButton, exitButton, loadButton;
     private Label nameLabel;
-    private AssetManager assetManager;
-    private MyGame game;
     private Texture loadingTexture;
     private OrthographicCamera camera;
     private FitViewport viewport;
-    private boolean nameDialogVisible = false;
     private boolean loadingCompleted = false;
     private boolean buttonsVisible = false;
-    private Timer.Task showButtonsTask;
-    private static final float VIRTUAL_HEIGHT = 600;
-//    private ImageButton loadButton;
 
     public LoadingScreen(MyGame game, AssetManager assetManager) {
         this.game = game;
         this.assetManager = assetManager;
-        batch = new SpriteBatch();
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
-        loadingTexture = new Texture(Gdx.files.internal("loading.png"));
-        Texture startButtonTexture = new Texture(Gdx.files.internal("start.png"));
-        Texture exitButtonTexture = new Texture(Gdx.files.internal("exit.png"));
-//        Texture loadButtonTexture = new Texture(Gdx.files.internal("load.png"));
-//        loadButton = new ImageButton(new TextureRegionDrawable(loadButtonTexture));
-//        loadButton.setVisible(false);
-        startButton = new ImageButton(new TextureRegionDrawable(startButtonTexture));
-        exitButton = new ImageButton(new TextureRegionDrawable(exitButtonTexture));
-        startButton.setVisible(false);
-        exitButton.setVisible(false);
-        stage = new Stage();
+        initialize();
+    }
+
+    private void initialize() {
         setupCameraAndViewport();
-        nameLabel = new Label("Enter Your Name:", skin);
-        nameLabel.setVisible(false);
-        setupProgressBar(skin);
-        setupUIComponents();
-        addInputListeners();
+        setupStageAndBatch();
+        setupSkinAndUI();
+        setupProgressBar();
+        setupInputListeners();
         Gdx.input.setInputProcessor(stage);
     }
 
@@ -75,43 +66,63 @@ public class LoadingScreen implements Screen {
         viewport.apply();
     }
 
-    private void setupProgressBar(Skin skin) {
-        skin = new Skin();
+    private void setupStageAndBatch() {
+        stage = new Stage();
+        batch = new SpriteBatch();
+    }
+
+    private void setupSkinAndUI() {
+        Skin skin = new Skin(Gdx.files.internal("uiskin.json"));
+        loadingTexture = new Texture(Gdx.files.internal("loading.png"));
+
+        startButton = createTextButton("Start", skin, 835f, viewport.getWorldHeight() / 18f);
+        exitButton = createTextButton("Exit", skin, 0, 0);
+        loadButton = createTextButton("Load", skin, viewport.getWorldWidth() - 250f, viewport.getWorldHeight() - 140f);
+        loadButton.setColor(Color.NAVY);
+
+        nameLabel = new Label("Enter Your Name:", skin);
+        nameLabel.setVisible(false);
+
+        stage.addActor(startButton);
+        stage.addActor(exitButton);
+        stage.addActor(loadButton);
+        stage.addActor(nameLabel);
+
+        toggleButtons(false);
+    }
+
+    private TextButton createTextButton(String text, Skin skin, float x, float y) {
+        TextButton button = new TextButton(text, skin);
+        button.setSize(250f, 140f);
+        button.setPosition(x, y);
+        return button;
+    }
+
+    private void setupProgressBar() {
+        Skin skin = new Skin();
         Pixmap pixmap = new Pixmap(20, 20, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
         pixmap.fill();
         skin.add("white", new Texture(pixmap));
-        ProgressBar.ProgressBarStyle progressBarStyle = new ProgressBar.ProgressBarStyle(
+
+        ProgressBar.ProgressBarStyle style = new ProgressBar.ProgressBarStyle(
             skin.newDrawable("white", Color.DARK_GRAY),
             skin.newDrawable("white", Color.BLUE)
         );
-        progressBarStyle.knobBefore = progressBarStyle.knob;
-        progressBar = new ProgressBar(0, 1, 0.01f, false, progressBarStyle);
+        style.knobBefore = style.knob;
+
+        progressBar = new ProgressBar(0, 1, 0.01f, false, style);
         progressBar.setSize(800f, 100f);
         progressBar.setPosition(
             (viewport.getWorldWidth() - progressBar.getWidth()) / 2f + 400f,
             150f
         );
-        progressBar.setValue(0f);
         progressBar.setAnimateDuration(1.3f);
         stage.addActor(progressBar);
         pixmap.dispose();
     }
 
-    private void setupUIComponents() {
-        startButton.setSize(250f, 140f);
-        startButton.setPosition(835f, viewport.getWorldHeight() / 18f);
-        exitButton.setSize(250f, 140f);
-        exitButton.setPosition(0, 0);
-        stage.addActor(nameLabel);
-        stage.addActor(startButton);
-        stage.addActor(exitButton);
-//        loadButton.setSize(250f, 140f);
-//        loadButton.setPosition(835f, viewport.getWorldHeight() / 18f + 160f); // Adjust position as needed
-//        stage.addActor(loadButton);
-    }
-
-    private void addInputListeners() {
+    private void setupInputListeners() {
         startButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -126,25 +137,34 @@ public class LoadingScreen implements Screen {
                 Gdx.app.exit();
             }
         });
-//        loadButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                game_screen loadedGameScreen = game_screen.loadGameState(game);
-//                game.setScreen(loadedGameScreen);
-//            }
-//        });
 
+        loadButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                try {
+                    game_screen loadedGameScreen = game.game_screen.loadGameState(game);
+                    game.setScreen(loadedGameScreen);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Game not saved", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                loadButton.setColor(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                loadButton.setColor(Color.NAVY);
+            }
+        });
 
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.ENTER) {
-                    if (!nameDialogVisible) {
-                        nameLabel.setVisible(true);
-                        nameDialogVisible = true;
-                    } else {
-                        game.switch_screen(game.level_screen);
-                    }
+                    game.switch_screen(game.level_screen);
                     return true;
                 } else if (keycode == Input.Keys.ESCAPE) {
                     game.clicksound.play();
@@ -156,15 +176,17 @@ public class LoadingScreen implements Screen {
         });
     }
 
-    @Override
-    public void show() {
-        Gdx.app.log("LoadingScreen", "Loading screen shown");
+    private void toggleButtons(boolean visible) {
+        startButton.setVisible(visible);
+        exitButton.setVisible(visible);
+        loadButton.setVisible(visible);
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(1, 1f, 1.5f, 1);
         batch.setProjectionMatrix(camera.combined);
+
         batch.begin();
         float imageWidth = 1440f;
         float imageHeight = 765f;
@@ -172,27 +194,18 @@ public class LoadingScreen implements Screen {
         float y = (viewport.getWorldHeight() - imageHeight) / 2f;
         batch.draw(loadingTexture, x, y, imageWidth, imageHeight);
         batch.end();
-        float progress = assetManager.getProgress();
-        progressBar.setValue(progress);
 
-        if (progress >= 1.0f && !loadingCompleted) {
+        progressBar.setValue(assetManager.getProgress());
+
+        if (!loadingCompleted && assetManager.getProgress() >= 1.0f) {
             loadingCompleted = true;
-            showButtonsTask = new Timer.Task() {
+            Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
                     progressBar.setVisible(false);
-                    startButton.setVisible(true);
-                    exitButton.setVisible(true);
-//                    loadButton.setVisible(true);
-                    buttonsVisible = true;
+                    toggleButtons(true);
                 }
-            };
-            Timer.schedule(showButtonsTask, 2f);
-        }
-
-        if (!buttonsVisible) {
-            startButton.setVisible(false);
-            exitButton.setVisible(false);
+            }, 2f);
         }
 
         stage.act(delta);
@@ -204,6 +217,9 @@ public class LoadingScreen implements Screen {
         viewport.update(width, height, true);
         stage.getViewport().update(width, height, true);
     }
+
+    @Override
+    public void show() {}
 
     @Override
     public void pause() {}
@@ -219,10 +235,5 @@ public class LoadingScreen implements Screen {
         batch.dispose();
         loadingTexture.dispose();
         stage.dispose();
-        ((TextureRegionDrawable) startButton.getStyle().imageUp).getRegion().getTexture().dispose();
-        ((TextureRegionDrawable) exitButton.getStyle().imageUp).getRegion().getTexture().dispose();
-        if (showButtonsTask != null) {
-            showButtonsTask.cancel();
-        }
     }
 }

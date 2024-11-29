@@ -14,9 +14,9 @@ public class Login_and_SignUp {
         this.dataManager = DataManager.getInstance();
         this.loginAttempts = 0;
         this.currentUser = currentUser;
-
         // Ensure data is saved when the application exits
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+
             dataManager.saveData();
             System.out.println("Data saved during shutdown.");
         }));

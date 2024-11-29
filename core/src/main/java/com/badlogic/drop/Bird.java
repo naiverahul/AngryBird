@@ -69,7 +69,7 @@ public class Bird extends Actor {
         // Create fixture definition
         fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
+        fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.5f;
         fixtureDef.restitution = 0.3f;
 

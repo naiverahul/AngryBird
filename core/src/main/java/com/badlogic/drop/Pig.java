@@ -40,7 +40,7 @@ public class Pig extends Actor {
         // creating fixture definition
         FixtureDef pig_fixture_def = new FixtureDef();
         pig_fixture_def.shape = shape;
-        pig_fixture_def.density = 1f;
+        pig_fixture_def.density = 0.5f;
         pig_fixture_def.friction = 0.5f;
         pig_fixture_def.restitution = 0.5f;
 

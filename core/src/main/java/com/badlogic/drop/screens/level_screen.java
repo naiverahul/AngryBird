@@ -4,60 +4,52 @@ import com.badlogic.drop.MyGame;
 import com.badlogic.drop.user.User;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-
-import javax.swing.JOptionPane;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 
 public class level_screen implements Screen {
-    private MyGame game;
-    private Stage stage;
-    private Texture backgroundTexture;
-    private ImageButton l_back_button, l_1_button, l_2_button, l_3_button, l_4_button, l_settings_button;
-
-    private User current_user;
+    private final MyGame game;
+    private final Stage stage;
+    private final User current_user;
+    private Skin skin;
 
     public level_screen(MyGame game) {
         this.game = game;
         this.current_user = game.current_user;
         this.stage = new Stage(new FitViewport(1920, 1080));
-
-        // Load background
-        backgroundTexture = new Texture(Gdx.files.internal("First_Screen_bkg.png"));
-
+        skin = new Skin(Gdx.files.internal("uiskin.json"));
         // Create UI components
         createUI();
     }
 
     private void createUI() {
-        // Create a table for layout
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
 
-        float buttonWidth = 200f;
-        float buttonHeight = 200f;
+        // Create scrollable level buttons
+        Table levelTable = new Table();
+        configureLevelButtons(levelTable);
 
-        // Initialize buttons
-        l_back_button = createButton("back.png");
-        l_1_button = createButton("level_number/1.png");
-        l_2_button = createButton("level_number/2.png");
-        l_3_button = createButton("level_number/3.png");
-        l_4_button = createButton("level_number/4.png");
-        l_settings_button = createButton("setting.png");
+        ScrollPane scrollPane = new ScrollPane(levelTable);
+        scrollPane.setFillParent(true);
+        scrollPane.setScrollingDisabled(true, false); // Enable vertical scrolling only
 
-        // Add click listeners
-        l_back_button.addListener(new ClickListener() {
+        // Create back button
+        ImageButton backButton = createImageButton("back.png");
+        backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.clicksound.play();
@@ -66,7 +58,9 @@ public class level_screen implements Screen {
             }
         });
 
-        l_settings_button.addListener(new ClickListener() {
+        // Create settings button
+        ImageButton settingsButton = createImageButton("setting.png");
+        settingsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.clicksound.play();
@@ -74,58 +68,91 @@ public class level_screen implements Screen {
             }
         });
 
-        // Configure level buttons based on user level
-        configureLevelButtons();
-
         // Add buttons to the table
         table.top().left();
-        table.add(l_back_button).size(buttonWidth, buttonHeight).left().pad(10);
+        table.add(backButton).size(100f, 100f).right().pad(20);
         table.row();
-        table.add(l_1_button).size(buttonWidth, buttonHeight).expandX().pad(20);
-        table.add(l_2_button).size(buttonWidth, buttonHeight).expandX().pad(20);
+        table.add(scrollPane).expand().fill().pad(20);
         table.row();
-        table.add(l_3_button).size(buttonWidth, buttonHeight).expandX().pad(20);
-        table.add(l_4_button).size(buttonWidth, buttonHeight).expandX().pad(20);
-        table.row();
-        table.add(l_settings_button).size(100f, 100f).expand().bottom().left().pad(10);
+        table.add(settingsButton).size(100f, 100f).expand().bottom().left().pad(10);
     }
 
-    private void configureLevelButtons() {
-        int level = current_user.getLevel(); // Get the user's unlocked level
-        ImageButton[] levelButtons = {l_1_button, l_2_button, l_3_button, l_4_button};
+    private ImageButton createImageButton(String texturePath) {
+        Texture texture = new Texture(Gdx.files.internal(texturePath));
+        TextureRegionDrawable drawable = new TextureRegionDrawable(new TextureRegion(texture));
+        ImageButton button = new ImageButton(drawable);
 
-        for (int i = 0; i < levelButtons.length; i++) {
-            if (i < level) {
-                enableLevelButton(levelButtons[i], i + 1);
-            } else {
-                disableLevelButton(levelButtons[i]);
+        // Add hover effect
+        button.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                button.getImage().setColor(Color.LIGHT_GRAY);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                button.getImage().setColor(Color.WHITE);
+            }
+        });
+
+        return button;
+    }
+    private void configureLevelButtons(Table levelTable) {
+        // Retrieve screen dimensions to calculate button sizes dynamically
+        float buttonWidth = Gdx.graphics.getWidth() / 5f;  // 1/5th of screen width
+        float buttonHeight = Gdx.graphics.getHeight() / 5f; // 1/5th of screen height
+
+        int userLevel = current_user.getLevel(); // Get the user's current level
+
+        for (int i = 1; i <= userLevel; i++) { // Allow 100 levels beyond the current unlocked level
+            TextButton levelButton = createLevelButton("Level " + i, buttonWidth, buttonHeight);
+
+            levelButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    game.clicksound.play();
+                    game.setScreen(new game_screen(game));
+                }
+            });
+
+            levelTable.add(levelButton).size(buttonWidth, buttonHeight).pad(20);
+
+            // Move to the next row after every 4 buttons
+            if (i % 4 == 0) {
+                levelTable.row();
             }
         }
     }
 
-    private void enableLevelButton(ImageButton button, int level) {
-        button.addListener(new ClickListener() {
+    private TextButton createLevelButton(String labelText, float buttonWidth, float buttonHeight) {
+        // Create button style
+        TextButtonStyle buttonStyle = new TextButtonStyle();
+        buttonStyle.up = skin.newDrawable("white", Color.LIGHT_GRAY); // Default background color
+        buttonStyle.over = skin.newDrawable("white", Color.DARK_GRAY); // Hover background color
+        buttonStyle.down =skin.newDrawable("white", Color.GRAY); // Clicked background color
+        buttonStyle.font = skin.getFont("default-font");
+        buttonStyle.fontColor = Color.NAVY; // Default font color
+
+        // Create button with the label
+        TextButton levelButton = new TextButton(labelText, buttonStyle);
+        levelButton.setSize(buttonWidth, buttonHeight);
+        levelButton.getLabel().setAlignment(Align.center);
+        levelButton.getLabel().setFontScale(2); // Scale text for visibility
+
+        // Add hover effects for font color
+        levelButton.addListener(new ClickListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.clicksound.play();
-                game.setScreen(new game_screen(game));
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                levelButton.getLabel().setColor(Color.WHITE); // Change font color on hover
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                levelButton.getLabel().setColor(Color.NAVY); // Reset font color when not hovering
             }
         });
-    }
 
-    private void disableLevelButton(ImageButton button) {
-        button.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.clicksound.play();
-                JOptionPane.showMessageDialog(null, "You need to complete the previous levels to unlock this level!");
-            }
-        });
-    }
-
-    private ImageButton createButton(String texturePath) {
-        Texture texture = new Texture(Gdx.files.internal(texturePath));
-        return new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
+        return levelButton;
     }
 
     @Override
@@ -136,11 +163,6 @@ public class level_screen implements Screen {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.CYAN);
-
-        // Draw background
-        stage.getBatch().begin();
-        stage.getBatch().draw(backgroundTexture, 0, 0, stage.getViewport().getWorldWidth(), stage.getViewport().getWorldHeight());
-        stage.getBatch().end();
 
         // Draw UI
         stage.act(delta);
@@ -164,6 +186,5 @@ public class level_screen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-        backgroundTexture.dispose();
     }
 }

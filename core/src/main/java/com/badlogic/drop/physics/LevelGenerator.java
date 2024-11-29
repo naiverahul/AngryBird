@@ -3,6 +3,7 @@ package com.badlogic.drop.physics;
 import com.badlogic.drop.MyGame;
 import com.badlogic.drop.Pig;
 import com.badlogic.drop.block_struct;
+import com.badlogic.drop.user.User;
 import com.badlogic.gdx.math.Vector2;
 // import com.badlogic.gdx.ai.btree.decorator.Random;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -18,8 +19,9 @@ public class LevelGenerator {
     private Stage lg_stage;
     private Random lg_random;
     private World lg_world;
+    private User user;
 
-    private final int[] min = { 1100, 150 }, max = { 1700, 400 };
+    private final int[] min = { 1100, 150 }, max = { 1500, 400 };
     private final int block_height = 6, max_structures = 5;
 
     private String pigs_base = "Pigimages/pig", block_base_directory = "Structures/";
@@ -30,6 +32,7 @@ public class LevelGenerator {
         this.lg_world = world;
         this.lg_stage = stage;
         this.lg_random = new Random();
+        this.user = game.current_user;
     }
 
     public void generateLevel(BodyDef bd, FixtureDef fd) {
@@ -40,8 +43,8 @@ public class LevelGenerator {
         // generatng defense
         for (int structure_count = 0; structure_count < max_structures; structure_count++) {
             int baseX = min[0] + lg_random.nextInt(max[0] - min[0]);
-
-            int structure_height = 3 + lg_random.nextInt(3);
+            int  structure_height = user.getLevel();
+            structure_height += lg_random.nextInt(2);
 
             for (int i = 0; i < structure_height; i++) {
 

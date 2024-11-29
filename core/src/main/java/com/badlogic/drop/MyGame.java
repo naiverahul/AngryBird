@@ -15,6 +15,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class MyGame extends Game {
     public LoadingScreen loadingScreen;
@@ -29,6 +30,7 @@ public class MyGame extends Game {
     public Sound clicksound;
     public Play play;
     public User current_user;
+    public Skin skin;
     // protected FirstScreen firstScreen;
     // protected level_screen pause_screen;
     // protected WinScreen win_screen;
@@ -62,6 +64,7 @@ public class MyGame extends Game {
         // lose_screen = new LoseScreen(this);
         lose_screen = new lose_screen(this);
         switch_screen(loadingScreen);
+        this.skin = new Skin(Gdx.files.internal("uiskin.json"));
     }
 
     public void switch_screen(Screen target_screen) {

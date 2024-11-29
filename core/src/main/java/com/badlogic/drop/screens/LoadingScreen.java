@@ -144,8 +144,9 @@ public class LoadingScreen implements Screen {
                 try {
                     game_screen loadedGameScreen = game.game_screen.loadGameState(game);
                     game.setScreen(loadedGameScreen);
+                    game.setGameScreen(loadedGameScreen);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Game not saved", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Game not saved : "+e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
 

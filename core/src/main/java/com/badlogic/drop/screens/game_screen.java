@@ -1,11 +1,7 @@
 package com.badlogic.drop.screens;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 import com.badlogic.drop.Bird;
 import com.badlogic.drop.MyGame;
@@ -101,12 +97,12 @@ public class game_screen implements Screen, Serializable {
         create_contact_listener();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             saveGameState();
-            System.out.println("Saved Game State");
+            System.out.println("Saved Game State 1");
         }));
     }
 
     public void saveGameState() {
-        GameState gameState = current_user.getGameState();
+        GameState gameState = new GameState();
         gameState.setBlock_position_list(this.block_position_list);
         gameState.setPig_positions(this.pig_positions);
         gameState.setPig_textures_used(this.pig_textures_used);
@@ -114,30 +110,35 @@ public class game_screen implements Screen, Serializable {
         gameState.bird_position = current_bird.getBody().getPosition();
         gameState.bird_velocity = current_bird.getBody().getLinearVelocity();
         gameState.current_bird_index = current_bird_index;
-
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("game_state.ser"))) {
-            oos.writeObject(gameState);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        current_user.setGameState(gameState);
     }
     public game_screen loadGameState(MyGame game) {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("game_state.ser"))) {
-            GameState gameState = (GameState) ois.readObject();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("data.ser"))) {
+//            HashMap<> init_user = (HashMap<String,User>) ois.readObject();
+            GameState gameState = current_user.getGameState();
             game_screen screen = new game_screen(game);
-            screen.block_position_list = gameState.getBlock_position_list();
-            screen.pig_positions = gameState.getPig_positions();
-            screen.pig_textures_used = gameState.getPig_textures_used();
-            screen.block_type_list = gameState.getBlock_type_list();
+//            screen.block_position_list = gameState.getBlock_position_list();
+//            screen.pig_positions = gameState.getPig_positions();
+//            screen.pig_textures_used = gameState.getPig_textures_used();
+//            screen.block_type_list = gameState.getBlock_type_list();
             screen.current_bird_index = gameState.current_bird_index;
             screen.current_bird = screen.birds.get(screen.current_bird_index);
             screen.initial_bird_position = gameState.bird_position;
             screen.current_bird.getBody().setTransform(gameState.bird_position, 0);
             screen.current_bird.getBody().setLinearVelocity(gameState.bird_velocity);
+            System.out.println(gameState.bird_position);
+            System.out.println(gameState.bird_velocity);
+            System.out.println(gameState.current_bird_index);
+            System.out.println(screen.block_position_list.size());
+            System.out.println(screen.pig_positions.size());
+            System.out.println(screen.pig_textures_used.size());
+            System.out.println(screen.block_type_list.size());
             return screen;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            return new game_screen(game); // Return a new game_screen if loading fails
+            System.out.println("Error loading game state");
+            Gdx.app.exit();
+            return null;
         }
     }
 
@@ -441,6 +442,24 @@ public class game_screen implements Screen, Serializable {
         return direction.scl(distance * forceMultiplier); // Scale by distance
     }
 
+    private void draw_projectile(Vector2 velocity) {
+        int t = 1;
+        float delta = 0.1f;
+        velocity = velocity.scl(0.0001f);
+        shape_renderer.begin(ShapeRenderer.ShapeType.Filled);
+        for (int i = 0; i < 100000; i++) {
+            if(velocity.x>drastart.x && velocity.y>drastart.y && velocity.x<draend.x && velocity.y<draend.y){ {
+                float x = velocity.x * t * delta;
+                float y = (velocity.y * t - (0.5f) * gravity * t * t) * delta;
+                shape_renderer.setColor(Color.RED);
+                shape_renderer.circle(x, y, 10f);
+                t++;
+            }
+
+        }
+        shape_renderer.end();
+    }
+
     @Override
     public void show() {
         InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -492,6 +511,7 @@ public class game_screen implements Screen, Serializable {
 
                 if (is_dragging && !isLaunched) {
                     draend = stage.screenToStageCoordinates(new Vector2(screenX, screenY));
+                    Vector2 velocity = calculateImpulse(drastart, draend);
                 }
                 return true;
             }
@@ -601,7 +621,9 @@ public class game_screen implements Screen, Serializable {
             shape_renderer.begin(ShapeRenderer.ShapeType.Line);
             shape_renderer.setColor(Color.RED);
             shape_renderer.line(drastart.x, drastart.y, draend.x, draend.y);
+
             shape_renderer.end();
+            draw_projectile(calculateImpulse(drastart, draend));
         }
         while (!bodiesToDestroy.isEmpty()) {
             Body body = bodiesToDestroy.poll();

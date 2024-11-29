@@ -66,7 +66,9 @@ public class MyGame extends Game {
         switch_screen(loadingScreen);
         this.skin = new Skin(Gdx.files.internal("uiskin.json"));
     }
-
+    public void setGameScreen(game_screen game_screen) {
+        this.game_screen = game_screen;
+    }
     public void switch_screen(Screen target_screen) {
         // setScreen(firstScreen);
         // setScreen(level_screen);

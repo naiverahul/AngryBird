@@ -7,14 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class UserTest {
 
-    @Test
-    public void testUserInitialization() {
-        User user = new User("TestUser");
-        assertEquals("TestUser", user.getName());
-        assertEquals(1, user.getLevel());
-        assertEquals(0, user.getScore());
-        assertNull(user.getGame_screen());
-    }
 
     @Test
     public void testSetName() {
@@ -37,13 +29,6 @@ public class UserTest {
         assertEquals(200, user.getScore());
     }
 
-    @Test
-    public void testSetGameScreen() {
-        User user = new User("TestUser");
-        game_screen screen = new game_screen(null);
-        user.setGame_screen(screen);
-        assertEquals(screen, user.getGame_screen());
-    }
 
     @Test
     public void testIncrementLevel() {

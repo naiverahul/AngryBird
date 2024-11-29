@@ -15,7 +15,7 @@ public class User implements Serializable {
         this.name = name;
         this.level = 1;
         this.score = 0;
-        this.gameState = new GameState();
+        this.gameState = null;
     }
 
     public String getName() {

@@ -2,8 +2,7 @@ package com.badlogic.drop.screens;
 
 import com.badlogic.drop.MyGame;
 import com.badlogic.drop.user.User;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -24,12 +23,14 @@ public class level_screen implements Screen {
     private final Stage stage;
     private final User current_user;
     private Skin skin;
+    private Texture background ;
 
     public level_screen(MyGame game) {
         this.game = game;
         this.current_user = game.current_user;
         this.stage = new Stage(new FitViewport(1920, 1080));
         skin = new Skin(Gdx.files.internal("uiskin.json"));
+        this.background = new Texture(Gdx.files.internal("loading2.png"));
         // Create UI components
         createUI();
     }
@@ -38,6 +39,7 @@ public class level_screen implements Screen {
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
+
 
         // Create scrollable level buttons
         Table levelTable = new Table();
@@ -129,7 +131,7 @@ public class level_screen implements Screen {
         TextButtonStyle buttonStyle = new TextButtonStyle();
         buttonStyle.up = skin.newDrawable("white", Color.LIGHT_GRAY); // Default background color
         buttonStyle.over = skin.newDrawable("white", Color.DARK_GRAY); // Hover background color
-        buttonStyle.down =skin.newDrawable("white", Color.GRAY); // Clicked background color
+        buttonStyle.down =skin.newDrawable("white", new Color(1, 1, 1, 0)); // Clicked background color
         buttonStyle.font = skin.getFont("default-font");
         buttonStyle.fontColor = Color.NAVY; // Default font color
 
@@ -158,12 +160,27 @@ public class level_screen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(new InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                if (keycode == Input.Keys.BACKSPACE) {
+                    game.setScreen(game.loadingScreen);
+                    dispose();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(Color.CYAN);
-
+        stage.getBatch().begin();
+        stage.getBatch().draw(background, 0, 0, 1920, 1080);
+        stage.getBatch().end();
         // Draw UI
         stage.act(delta);
         stage.draw();

@@ -414,6 +414,7 @@ public class game_screen implements Screen, Serializable {
     }
 
     private void change_catapult_bird() {
+
         if (birds.size() == 0) {
             ori_game_variable.lose_screen.dispose();
             ori_game_variable.lose_screen = new lose_screen(ori_game_variable);
@@ -422,7 +423,7 @@ public class game_screen implements Screen, Serializable {
 
             ori_game_variable.setScreen(ori_game_variable.lose_screen);
         } else {
-            // current_bird.setdestroy(this.bodiesToDestroy, birds, current_bird_index);
+//             current_bird.setdestroy(this.bodiesToDestroy, birds, current_bird_index);
             current_bird_index = (current_bird_index + 1) % (birds.size());
             current_bird = birds.get(current_bird_index);
             current_bird.getBody().setAwake(false);
@@ -431,8 +432,7 @@ public class game_screen implements Screen, Serializable {
                 // Wait for the body to be set to sleep
             }
             current_bird.getBody().setAwake(false);
-
-            current_bird.setPosition(initial_bird_position);
+            current_bird.setPosition(new Vector2(13000, 22000));
         } // Reset to initial position
     }
 

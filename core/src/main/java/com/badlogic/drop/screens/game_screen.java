@@ -117,6 +117,10 @@ public class game_screen implements Screen, Serializable {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("data.ser"))) {
 //            HashMap<> init_user = (HashMap<String,User>) ois.readObject();
             GameState gameState = current_user.getGameState();
+            if(gameState == null) {
+                System.out.println("Game state is null");
+                return null;
+            }
             game_screen screen = new game_screen(game);
 //            screen.block_position_list = gameState.getBlock_position_list();
 //            screen.pig_positions = gameState.getPig_positions();

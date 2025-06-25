@@ -93,7 +93,7 @@ public class LoadingScreen implements Screen {
 
     private TextButton createTextButton(String text, Skin skin, float x, float y) {
         TextButton button = new TextButton(text, skin);
-        button.setSize(250f, 140f);
+        button.setSize(250f, 90f);
         button.setPosition(x, y);
         return button;
     }
